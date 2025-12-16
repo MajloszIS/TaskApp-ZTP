@@ -17,7 +17,7 @@ public class NotesAppFacade
     }
     public void Register(string username, string password)
     {
-
+        authService.Register(username, password);
     }
     public bool Login(string username, string password) 
     { 

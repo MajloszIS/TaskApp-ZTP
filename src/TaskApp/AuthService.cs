@@ -11,11 +11,12 @@ public class AuthService
     }
     public void Register(string username, string password)
     {
-
+        var newUser = new User(username, password);
+        userRepository.Add(newUser);
     }
     public bool Login(string username, string password)
     {
-
+        return true;
     }
     public void Logout()
     {
