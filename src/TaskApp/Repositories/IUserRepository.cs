@@ -6,7 +6,12 @@ using TaskApp.Access;
 using TaskApp.Repository;
 //niektóre trzeba usunąc, nie wszystkie są potrzebne
 
-public class NotesTasksApp
+
+namespace TaskApp.Repository;
+
+public interface IUserRepository
 {
-    
+    User GetById(Guid id);
+    User GetByUsername(string username);
+    void Add(User user);
 }

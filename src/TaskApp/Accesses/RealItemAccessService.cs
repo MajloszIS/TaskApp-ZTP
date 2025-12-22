@@ -1,4 +1,14 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using TaskApp.Commands;
+using TaskApp.Items;
+using TaskApp.Observer;
+using TaskApp.Access;
+using TaskApp.Repository;
+//niektóre trzeba usunąc, nie wszystkie są potrzebne
+
+namespace TaskApp.Access;
+
 public class RealItemAccessService : IItemAccess
 {
     private readonly IItemRepository itemRepo;
@@ -10,11 +20,13 @@ public class RealItemAccessService : IItemAccess
     }
     public IItem GetItem(User user, Guid id)
     {
-        
+        var list = new Note();
+        return list;
     }
     public List<IItem> GetItemsForUser(User user)
     {
-        
+        var list = new List<IItem>();
+        return list;
     }
     public void SaveItem(User user, IItem item)
     {

@@ -6,7 +6,12 @@ using TaskApp.Access;
 using TaskApp.Repository;
 //niektóre trzeba usunąc, nie wszystkie są potrzebne
 
-public class NotesTasksApp
+namespace TaskApp.Observer;
+
+public class NotificationService : IItemObserver
 {
-    
+    public void Update(ItemChangeEvent evt)
+    {
+
+    }
 }
