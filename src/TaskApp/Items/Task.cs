@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using TaskApp.Commands;
-using TaskApp.Items;
 
 namespace TaskApp.Items;
 
@@ -11,5 +8,14 @@ public class Task : ItemBase
     public DateTime DueDate;
     public int Priority;
 
-    public override IItem Clone() { return null; }
+    public override IItem Clone()
+    {
+        return new Task
+        {
+            IsCompleted = this.IsCompleted,
+            DueDate = this.DueDate,
+            Priority = this.Priority,
+            Title = this.Title
+        };
+    }
 }

@@ -1,14 +1,19 @@
 using System;
-using System.Collections.Generic;
-using TaskApp.Commands;
-using TaskApp.Items;
 
 namespace TaskApp.Items;
 
 public class Note : ItemBase
 {
-    public string Content;
-    public List<string> Tags;
+    public string? Content;
+    public List<string>? Tags;
 
-    public override IItem Clone() { return null; }
+    public override IItem Clone()
+    {
+        return new Note
+        {
+            Content = this.Content,
+            Tags = this.Tags,
+            Title = this.Title
+        };
+    }
 }

@@ -1,17 +1,33 @@
 using System;
-using System.Collections.Generic;
-using TaskApp.Commands;
-using TaskApp.Items;
 
 namespace TaskApp.Items;
 
 public class ItemGroup : ItemBase
 {
-    private List<IItem> Children;
+    private List<IItem> Children { get; }
 
-    public void Add(IItem item) { }
-    public void Remove(IItem item) { }
-    public List<IItem> GetChildren() { return null; }
+    public ItemGroup(List<IItem> items)
+    {
+        Children = items;
+    }
 
-    public override IItem Clone() { return null; }
+    public void Add(IItem item)
+    {
+        Children.Add(item);
+    }
+    public void Remove(IItem item)
+    {
+        Children.Remove(item);
+    }
+
+    public override IItem Clone(){ return null; }
+    /*
+    public override IItem Clone()
+    { 
+        return new ItemGroup
+        {
+            Title = this.Title
+        }; 
+    }
+    */
 }
