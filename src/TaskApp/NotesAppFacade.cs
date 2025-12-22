@@ -1,4 +1,8 @@
 ﻿using System;
+using TaskApp.Commands;
+using TaskApp.Items;
+using TaskApp.Observer;
+
 public class NotesAppFacade
 {
     private readonly AuthService authService;
@@ -8,11 +12,10 @@ public class NotesAppFacade
     private readonly ItemQueryService queryService;
     public NotesAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
-        authService = new AuthService(userRepo);
+        authService = new AuthService(userRepo, new User("",""));
         queryService = new ItemQueryService(itemRepo);
         history = new CommandHistory();
-        itemManager = new ItemManager();
-        realItemAccess = new RealItemAccessService(itemRepo, userRepo);
+        itemManager = new ItemManager(new ItemRepository());
         itemAccess = null;
     }
     public void Register(string username, string password)
@@ -21,7 +24,7 @@ public class NotesAppFacade
     }
     public bool Login(string username, string password) 
     { 
-
+        return true;
     }
     public void AddNote(string title, string content)
     {
@@ -53,11 +56,13 @@ public class NotesAppFacade
     }
     public List<IItem> FilterItems(string criteria)
     {
-        
+        var list = new List<IItem>();
+        return list;
     }
     public List<IItem> SearchItems(string text)
     {
-        
+        var list = new List<IItem>();
+        return list;
     }
     public void Undo()
     {

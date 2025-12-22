@@ -1,4 +1,7 @@
 ﻿using System;
+using TaskApp.Commands;
+using TaskApp.Items;
+using TaskApp.Observer;
 
 public class AuthService
 {
@@ -24,10 +27,11 @@ public class AuthService
     }
     public User GetCurrentUser()
     {
-
+        var user = new User("","");
+        return user;
     }
     private string FakeHashMethod(string password)
     {
-
+        return "";
     }
 }

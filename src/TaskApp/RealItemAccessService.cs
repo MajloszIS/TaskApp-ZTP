@@ -1,4 +1,8 @@
 ﻿using System;
+using TaskApp.Commands;
+using TaskApp.Items;
+using TaskApp.Observer;
+
 public class RealItemAccessService : IItemAccess
 {
     private readonly IItemRepository itemRepo;
@@ -10,11 +14,13 @@ public class RealItemAccessService : IItemAccess
     }
     public IItem GetItem(User user, Guid id)
     {
-        
+        var list = new Note();
+        return list;
     }
     public List<IItem> GetItemsForUser(User user)
     {
-        
+        var list = new List<IItem>();
+        return list;
     }
     public void SaveItem(User user, IItem item)
     {

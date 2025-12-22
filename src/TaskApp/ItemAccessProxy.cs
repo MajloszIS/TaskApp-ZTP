@@ -1,4 +1,8 @@
 ﻿using System;
+using TaskApp.Commands;
+using TaskApp.Items;
+using TaskApp.Observer;
+
 public class ItemAccessProxy : IItemAccess
 {
     private readonly IItemAccess innerService;
@@ -9,11 +13,13 @@ public class ItemAccessProxy : IItemAccess
     }
     public IItem GetItem(User user, Guid id)
     {
-        
+        var item = new Note();
+        return item;
     }
     public List<IItem> GetItemsForUser(User user)
     {
-        
+        var list = new List<IItem>();
+        return list;
     }
     public void SaveItem(User user, IItem item)
     {
