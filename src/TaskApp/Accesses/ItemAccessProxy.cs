@@ -1,21 +1,22 @@
-﻿using System;
+using System;
 using TaskApp.Commands;
 using TaskApp.Items;
 using TaskApp.Observer;
 
-public class RealItemAccessService : IItemAccess
+namespace TaskApp.Access;
+
+public class ItemAccessProxy : IItemAccess
 {
-    private readonly IItemRepository itemRepo;
-    private readonly IUserRepository userRepo;
-    public RealItemAccessService(IItemRepository itemRepo, IUserRepository userRepo)
+    private readonly IItemAccess innerService;
+    private readonly User currentUser;
+    public ItemAccessProxy(IItemAccess innerService)
     {
-        this.itemRepo = itemRepo;
-        this.userRepo = userRepo;
+        this.innerService = innerService;
     }
     public IItem GetItem(User user, Guid id)
     {
-        var list = new Note();
-        return list;
+        var item = new Note();
+        return item;
     }
     public List<IItem> GetItemsForUser(User user)
     {

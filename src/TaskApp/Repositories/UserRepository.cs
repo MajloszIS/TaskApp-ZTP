@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using TaskApp.Commands;
 using TaskApp.Items;
 using TaskApp.Observer;
 using System.Collections.Generic;
 using System.Linq;
+
+namespace TaskApp.Repository;
 
 public class UserRepository : IUserRepository
 {

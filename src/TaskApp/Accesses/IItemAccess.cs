@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using TaskApp.Commands;
 using TaskApp.Items;
 using TaskApp.Observer;
+
+namespace TaskApp.Access;
 
 public interface IItemAccess
 {
