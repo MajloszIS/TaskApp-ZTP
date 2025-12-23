@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
-using TaskApp.Commands;
 using TaskApp.Items;
-using TaskApp.Observer;
-using TaskApp.Access;
-using TaskApp.Repository;
-//niektóre trzeba usunąc, nie wszystkie są potrzebne
 
 namespace TaskApp.Access;
 
@@ -13,26 +8,43 @@ public class ItemAccessProxy : IItemAccess
 {
     private readonly IItemAccess innerService;
     private readonly User currentUser;
-    public ItemAccessProxy(IItemAccess innerService)
+    public ItemAccessProxy(IItemAccess innerService, User currentUser)
     {
         this.innerService = innerService;
+        this.currentUser = currentUser;
     }
-    public IItem GetItem(User user, Guid id)
+    public IItem GetItem(Guid userId, Guid itemId)
     {
-        var item = new Note();
+        if(userId != currentUser.Id)
+        {
+            throw new Exception("Cannot access items of another user");
+        }
+        var item = innerService.GetItem(userId, itemId);
         return item;
     }
-    public List<IItem> GetItemsForUser(User user)
+    public List<IItem> GetItemsForUser(Guid userId)
     {
-        var list = new List<IItem>();
-        return list;
+        if(userId != currentUser.Id)
+        {
+            throw new Exception("Cannot access items of another user");
+        }
+        var items = innerService.GetItemsForUser(userId);
+        return items;
     }
-    public void SaveItem(User user, IItem item)
+    public void SaveItem(Guid userId, IItem item)
     {
-        
+        if(userId != currentUser.Id)
+        {
+            throw new Exception("Cannot save item for another user");
+        }
+        innerService.SaveItem(userId, item);
     }
-    public void ShareItem(User owner, User target, IItem item)
+    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
     {
-        
+        if(ownerId != currentUser.Id)
+        {
+            throw new Exception("Only the owner can share the item");
+        }
+        innerService.ShareItem(ownerId, targetId, itemId);
     }
 }

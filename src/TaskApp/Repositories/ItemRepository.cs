@@ -1,10 +1,6 @@
 using System;
-using TaskApp.Commands;
+using System.Collections.Generic;
 using TaskApp.Items;
-using TaskApp.Observer;
-using TaskApp.Access;
-using TaskApp.Repository;
-//niektóre trzeba usunąc, nie wszystkie są potrzebne
 
 
 namespace TaskApp.Repository;
@@ -16,26 +12,48 @@ public class ItemRepository : IItemRepository
     {
         itemsByUser = new Dictionary<Guid, List<IItem>>();
     }
-    public IItem GetById(Guid id)
+    public IItem GetById(Guid userId)
     {
-        var list = new Note();
-        return list;
+        foreach (var userItems in itemsByUser.Values)
+        {
+            foreach (var item in userItems)
+            {
+                if (item.Id == userId)
+                {
+                    return item;
+                }
+            }
+        }
+        throw new Exception("Item not found");
     }
-    public List<IItem> GetAllForUser(User user)
+    public List<IItem> GetAllForUser(Guid userId)
     {
-        var list = new List<IItem>();
-        return list;
+        var userList = itemsByUser[userId];
+        return userList;
     }
-    public void Add(User user, IItem item)
+    public void Add(Guid userId, IItem item)
     {
-        
+        if (!itemsByUser.ContainsKey(userId))
+        {
+            itemsByUser[userId] = new List<IItem>();
+        }
+        itemsByUser[userId].Add(item);
     }
-    public void Update(User user, IItem item)
+    public void Update(Guid userId, IItem item)
     {
-        
+        if (!itemsByUser.ContainsKey(userId))
+        {
+            throw new Exception("User has no items");
+        }
+        itemsByUser[userId].Remove(item);
+        itemsByUser[userId].Add(item);
     }
-    public void Delete(User user, IItem item)
+    public void Delete(Guid userId, IItem item)
     {
-        
+        if (!itemsByUser.ContainsKey(userId))
+        {
+            throw new Exception("User has no items");
+        }
+        itemsByUser[userId].Remove(item);
     }
 }

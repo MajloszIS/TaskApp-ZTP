@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using TaskApp.Commands;
 using TaskApp.Items;
-using TaskApp.Observer;
-using TaskApp.Access;
 using TaskApp.Repository;
-//niektóre trzeba usunąc, nie wszystkie są potrzebne
 
 namespace TaskApp.Access;
 
@@ -18,22 +14,22 @@ public class RealItemAccessService : IItemAccess
         this.itemRepo = itemRepo;
         this.userRepo = userRepo;
     }
-    public IItem GetItem(User user, Guid id)
+    public IItem GetItem(Guid userId, Guid itemId)
     {
-        var list = new Note();
-        return list;
+        var item = itemRepo.GetById(itemId);
+        return item;
     }
-    public List<IItem> GetItemsForUser(User user)
+    public List<IItem> GetItemsForUser(Guid userId)
     {
-        var list = new List<IItem>();
-        return list;
+        var items = itemRepo.GetAllForUser(userId);
+        return items;
     }
-    public void SaveItem(User user, IItem item)
+    public void SaveItem(Guid userId, IItem item)
     {
-        
+        itemRepo.Update(userId, item);
     }
-    public void ShareItem(User owner, User target, IItem item)
+    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
     {
-        
+        //to do: implement sharing logic
     }
 }

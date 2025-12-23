@@ -4,34 +4,41 @@ using TaskApp.Items;
 using TaskApp.Observer;
 using TaskApp.Access;
 using TaskApp.Repository;
-//niektóre trzeba usunąc, nie wszystkie są potrzebne
 
-public class NotesAppFacade
+public class TaskAppFacade
 {
     private readonly AuthService authService;
     private readonly ItemManager itemManager;
     private readonly CommandHistory history;
     private readonly IItemAccess itemAccess;
     private readonly ItemQueryService queryService;
-    public NotesAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
+    public TaskAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
-        authService = new AuthService(userRepo, new User("",""));
+        authService = new AuthService(userRepo);
         queryService = new ItemQueryService(itemRepo);
         history = new CommandHistory();
         itemManager = new ItemManager(new ItemRepository());
-        itemAccess = null;
+        itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo, userRepo), authService.GetCurrentUser());
     }
     public void Register(string username, string password)
-    {
+    {   
+        if(authService.GetCurrentUser() != null)
+        {
+            throw new Exception("A user is already logged in");
+        }
         authService.Register(username, password);
     }
     public bool Login(string username, string password) 
     { 
-        return true;
+        if(authService.GetCurrentUser() != null)
+        {
+            throw new Exception("A user is already logged in");
+        }
+        return authService.Login(username, password);
     }
     public void AddNote(string title, string content)
     {
-
+        
     }
     public void AddTask(string title, DateTime dueDate ,string content)
     {
