@@ -4,9 +4,14 @@ namespace TaskApp.Items;
 
 public class Task : ItemBase
 {
-    public bool IsCompleted;
+    public bool IsCompleted { get; set; }
     public DateTime DueDate;
     public int Priority;
+
+    public Task()
+    {
+        
+    }
 
     public override IItem Clone()
     {
