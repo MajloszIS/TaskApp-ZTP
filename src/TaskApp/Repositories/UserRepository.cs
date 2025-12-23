@@ -1,11 +1,4 @@
 using System;
-using TaskApp.Commands;
-using TaskApp.Items;
-using TaskApp.Observer;
-using TaskApp.Access;
-using TaskApp.Repository;
-//niektóre trzeba usunąc, nie wszystkie są potrzebne
-
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,16 +13,50 @@ public class UserRepository : IUserRepository
     }
     public User GetById(Guid id)
     {
-        var user = new User("","");
-        return user;
+        if(id == Guid.Empty)
+        {
+            throw new ArgumentException("Invalid ID");
+        }
+
+        foreach (var user in _users)
+        {
+            if (user.Id == id)
+            {
+                return user;
+            }
+        }
+
+        throw new Exception("User not found");
     }
     public User GetByUsername(string username)
     {
-        var user = new User("","");
-        return user;
+        if(string.IsNullOrWhiteSpace(username))
+        {
+            throw new ArgumentException("Invalid username");
+        }
+
+        foreach (var user in _users)
+        {
+            if (user.Username == username)
+            {
+                return user;
+            }
+        }
+
+        throw new Exception("User not found");
     }
     public void Add(User user)
     {
+        if(user == null)
+        {
+            throw new ArgumentNullException(nameof(user), "User cannot be null");
+        }
 
+        if (_users.Any(u => u.Id == user.Id))
+        {
+            throw new Exception("User with the same ID already exists");
+        }
+
+        _users.Add(user);
     }
 }
