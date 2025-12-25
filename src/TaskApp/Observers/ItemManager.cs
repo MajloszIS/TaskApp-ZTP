@@ -6,7 +6,6 @@ using TaskApp.Access;
 using TaskApp.Repository;
 //niektóre trzeba usunąc, nie wszystkie są potrzebne
 
-
 namespace TaskApp.Observer;
 
 public class ItemManager : IItemObservable
