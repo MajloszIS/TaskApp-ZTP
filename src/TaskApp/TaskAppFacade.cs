@@ -15,7 +15,7 @@ public class TaskAppFacade
     public TaskAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
         authService = new AuthService(userRepo);
-        itemManager = new ItemManager(new ItemRepository());
+        itemManager = new ItemManager(itemRepo);
         history = new CommandHistory();
         itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo, userRepo), authService.GetCurrentUser());
         queryService = new ItemQueryService(itemRepo);
