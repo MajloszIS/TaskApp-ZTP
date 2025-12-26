@@ -15,7 +15,7 @@ public class ItemManager : IItemObservable
 
     public ItemManager(IItemRepository repo)
     {
-
+        this.repo = repo;
     }
 
     public void AddItem(User user, IItem item)
