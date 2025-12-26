@@ -13,6 +13,17 @@ public class AddItemCommand : ItemCommandBase
 {
     private ItemGroup parentGroup;
 
-    public override void Execute() { }
-    public override void Undo() { }
+    public AddItemCommand()
+    {
+        
+    }
+
+    public override void Execute()
+    {
+        
+    }
+    public override void Undo()
+    {
+        
+    }
 }
