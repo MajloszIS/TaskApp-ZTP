@@ -15,10 +15,11 @@ public class TaskAppFacade
     public TaskAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
         authService = new AuthService(userRepo);
-        queryService = new ItemQueryService(itemRepo);
+        itemManager = new ItemManager(itemRepo);
         history = new CommandHistory();
-        itemManager = new ItemManager(new ItemRepository());
         itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo, userRepo), authService.GetCurrentUser());
+        queryService = new ItemQueryService(itemRepo);
+
     }
     public void Register(string username, string password)
     {   
