@@ -7,19 +7,15 @@ public class Note : ItemBase
     public string? Content;
     public List<string>? Tags;
 
-    public Note(string content, List<string> tags, string title)
+    public Note(string title, string content)
+                :base(title)
     {
         this.Content = content;
-        this.Tags = tags;
-        this.Title = title;   
+        this.Tags = new List<string>();
     }
 
     public override IItem Clone()
     {
-        return new Note
-        (
-            content = this.Content,
-            tags = this.Tags
-        );
+        return new Note(this.Title, this.Content ?? "");
     }
 }

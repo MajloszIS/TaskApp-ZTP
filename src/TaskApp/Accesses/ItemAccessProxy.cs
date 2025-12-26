@@ -7,11 +7,10 @@ namespace TaskApp.Access;
 public class ItemAccessProxy : IItemAccess
 {
     private readonly IItemAccess innerService;
-    private readonly User currentUser;
-    public ItemAccessProxy(IItemAccess innerService, User currentUser)
+    private User? currentUser { set; get; }
+    public ItemAccessProxy(IItemAccess innerService)
     {
         this.innerService = innerService;
-        this.currentUser = currentUser;
     }
     public IItem GetItem(Guid userId, Guid itemId)
     {
