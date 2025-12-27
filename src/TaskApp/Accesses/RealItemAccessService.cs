@@ -8,14 +8,20 @@ namespace TaskApp.Access;
 public class RealItemAccessService : IItemAccess
 {
     private readonly IItemRepository itemRepo;
-    public RealItemAccessService(IItemRepository itemRepo)
+    private readonly IUserRepository userRepo;
+    public RealItemAccessService(IItemRepository itemRepo, IUserRepository userRepo)
     {
         this.itemRepo = itemRepo;
+        this.userRepo = userRepo;
     }
     public IItem GetItem(Guid userId, Guid itemId)
     {
         var item = itemRepo.GetById(itemId);
         return item;
+    }
+    public IItem GetItemByTitle(string title)
+    {
+        return itemRepo.GetByTitle(title);
     }
     public List<IItem> GetItemsForUser(Guid userId)
     {
@@ -32,6 +38,13 @@ public class RealItemAccessService : IItemAccess
     }
     public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
     {
-        //to do: implement sharing logic
+        var item = itemRepo.GetById(itemId);
+        var owner = userRepo.GetById(ownerId);
+        var target = userRepo.GetById(targetId);
+        if (!item.Owners.Contains(owner))
+        {
+            throw new Exception("You don't have access to this item");
+        }
+        item.Owners.Add(target);
     }
 }

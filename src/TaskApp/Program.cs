@@ -22,20 +22,24 @@ public class Program
 
         cosik.Login("alice", "password123");
         cosik.AddNote("Another Note", "Content for another note.");
-        var items = cosik.GetAllItems();
-        foreach(var item in items)
-        {
-            Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}");
-        }
         cosik.Login("alice", "password123");
 
         cosik.Register("bob", "securepass");
         cosik.Login("bob", "securepass");
         cosik.AddTask("Bob's Task", DateTime.Now.AddDays(3), 2);
+        cosik.ShareItemByTitle("Bob's Task", "alice");
         var bobItems = cosik.GetAllItems();
         foreach(var item in bobItems)
         {
             Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}");
         }
+        cosik.Logout();
+        cosik.Login("alice", "password123");
+        var items = cosik.GetAllItems();
+        foreach (var item in items)
+        {
+            Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}");
+        }
+        cosik.Login("alice", "password123");
     }
 }

@@ -22,6 +22,11 @@ public class ItemAccessProxy : IItemAccess
         var item = innerService.GetItem(userId, itemId);
         return item;
     }
+    public IItem GetItemByTitle(string title)
+    {
+        var item = innerService.GetItemByTitle(title);
+        return item;
+    }
     public List<IItem> GetItemsForUser(Guid userId)
     {
         var items = innerService.GetItemsForUser(userId);

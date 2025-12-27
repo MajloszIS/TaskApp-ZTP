@@ -12,12 +12,15 @@ public class ItemManager : IItemObservable
 {
     private readonly List<IItemObserver> observers = new();
     private readonly IItemAccess itemAccess;
-    private readonly IItemRepository repo;
+    private readonly IItemRepository itemRepo;
+    private readonly IUserRepository userRepo;
 
-    public ItemManager(IItemRepository repo)
+    public ItemManager(IItemRepository itemRepo, IUserRepository userRepo)
     {
-        this.repo = repo;
-        itemAccess = new ItemAccessProxy(new RealItemAccessService(repo));
+        this.itemRepo = itemRepo;
+        this.userRepo = userRepo;
+
+        itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo, userRepo));
     }
 
     public void AddItem(User user, IItem item)
@@ -39,11 +42,19 @@ public class ItemManager : IItemObservable
     {
         return itemAccess.GetItem(userId, itemId);
     }
+    public IItem? GetItemByTitle(string title)
+    {
+        return itemAccess.GetItemByTitle(title);
+    }
 
     public List<IItem> GetAllItems(User user)
     {
         var list = itemAccess.GetItemsForUser(user.Id);
         return list;
+    }
+    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
+    {
+        itemAccess.ShareItem(ownerId, targetId, itemId);
     }
 
     public void Attach(IItemObserver observer)

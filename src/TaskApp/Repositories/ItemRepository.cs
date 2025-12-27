@@ -26,6 +26,20 @@ public class ItemRepository : IItemRepository
         }
         throw new Exception("Item not found");
     }
+    public IItem GetByTitle(string title)
+    {
+        foreach (var userItems in itemsByUser.Values)
+        {
+            foreach (var item in userItems)
+            {
+                if (item.Title.Equals(title))
+                {
+                    return item;
+                }
+            }
+        }
+        throw new Exception("Item not found");
+    }
     public List<IItem> GetAllForUser(Guid userId)
     {
         var userList = itemsByUser[userId];
