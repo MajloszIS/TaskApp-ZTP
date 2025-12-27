@@ -55,10 +55,6 @@ public class ItemManager : IItemObservable
         var list = itemAccess.GetItemsForUser(user.Id);
         return list;
     }
-    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
-    {
-        itemAccess.ShareItem(ownerId, targetId, itemId);
-    }
 
     public void Attach(IItemObserver observer)
     {

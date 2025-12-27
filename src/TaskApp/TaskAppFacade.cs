@@ -99,7 +99,7 @@ public class TaskAppFacade
         if (target == null)
             throw new Exception("Target user not found");
 
-        new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, id), target).Execute();
+        new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, itemId), target).Execute();
     }
     public void ShareItemByTitle(string title, string targetUsername)
     {
@@ -116,8 +116,6 @@ public class TaskAppFacade
             throw new Exception("Target user not found");
 
         new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, item.Id), target).Execute();
-        var item = itemManager.GetItem(authService.GetCurrentUser().Id, itemId);
-        var targetUser = authService.GetByUsername(targetUsername);
     }
     public List<IItem> GetAllItems()
     {
