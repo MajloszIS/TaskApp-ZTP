@@ -21,7 +21,7 @@ public class ShareItemCommand : ItemCommandBase
 
     public override void Execute() 
     {
-        itemManager.ShareItem(user.Id, targetUser.Id, item.Id);
+        itemManager.ShareItem(user, targetUser, item);
     }
     public override void Undo() { }
 }

@@ -15,11 +15,11 @@ public class ItemAccessProxy : IItemAccess
     }
     public IItem GetItem(Guid userId, Guid itemId)
     {
-        if(userId != currentUser.Id)
+        var item = innerService.GetItem(userId, itemId);
+        if(item.Owners.Find(u => u.Id == userId) == null)
         {
             throw new Exception("Cannot access items of another user");
         }
-        var item = innerService.GetItem(userId, itemId);
         return item;
     }
     public IItem GetItemByTitle(string title)
@@ -50,10 +50,10 @@ public class ItemAccessProxy : IItemAccess
     }
     public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
     {
-        if(ownerId != currentUser.Id)
+        /*if(ownerId != currentUser.Id)
         {
             throw new Exception("Only the owner can share the item");
-        }
+        }*/
         innerService.ShareItem(ownerId, targetId, itemId);
     }
 }

@@ -28,10 +28,11 @@ public class Program
         cosik.Login("bob", "securepass");
         cosik.AddTask("Bob's Task", DateTime.Now.AddDays(3), 2);
         cosik.ShareItemByTitle("Bob's Task", "alice");
+
         var bobItems = cosik.GetAllItems();
         foreach(var item in bobItems)
         {
-            Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}");
+            Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}, onwers: {item.Owners[0].Username}, {item.Owners[1].Username} ");
         }
         cosik.Logout();
         cosik.Login("alice", "password123");
