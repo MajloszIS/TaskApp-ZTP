@@ -49,4 +49,8 @@ public class AuthService
         }
         return currentUser;
     }
+    public User GetByUsrn(string username)
+    {
+        return userRepository.GetByUsername(username);
+    }
 }

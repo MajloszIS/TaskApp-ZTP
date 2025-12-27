@@ -7,6 +7,7 @@ namespace TaskApp.Access;
 public interface IItemAccess
 {
     IItem GetItem(Guid userId, Guid itemId);
+    IItem GetItemByTitle(string title);
     List<IItem> GetItemsForUser(Guid userId);
     void SaveItem(Guid userId, IItem item);
     void DeleteItem(Guid userId, IItem item);

@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
+using TaskApp.Access;
 using TaskApp.Commands;
 using TaskApp.Items;
 using TaskApp.Observer;
-using TaskApp.Access;
 using TaskApp.Repository;
 
 public class TaskAppFacade
@@ -14,7 +15,7 @@ public class TaskAppFacade
     public TaskAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
         authService = new AuthService(userRepo);
-        itemManager = new ItemManager(itemRepo);
+        itemManager = new ItemManager(itemRepo, userRepo);
         history = new CommandHistory();
         queryService = new ItemQueryService(itemRepo);
     }
@@ -88,6 +89,33 @@ public class TaskAppFacade
     }
     public void ShareItem(Guid itemId, string targetUsername)
     {
+        var owner = authService.GetCurrentUser();
+
+        if (owner == null)
+            throw new Exception("No user is logged in");
+
+        var target = authService.GetByUsrn(targetUsername);
+
+        if (target == null)
+            throw new Exception("Target user not found");
+
+        new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, id), target).Execute();
+    }
+    public void ShareItemByTitle(string title, string targetUsername)
+    {
+        var owner = authService.GetCurrentUser();
+
+        var item = itemManager.GetItemByTitle(title);
+
+        if (owner == null)
+            throw new Exception("No user is logged in");
+
+        var target = authService.GetByUsrn(targetUsername);
+
+        if (target == null)
+            throw new Exception("Target user not found");
+
+        new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, item.Id), target).Execute();
         var item = itemManager.GetItem(authService.GetCurrentUser().Id, itemId);
         var targetUser = authService.GetByUsername(targetUsername);
     }
