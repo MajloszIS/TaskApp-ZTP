@@ -87,7 +87,7 @@ public class TaskAppFacade
     {
         
     }
-    public void ShareItem(Guid id, string targetUsername)
+    public void ShareItem(Guid itemId, string targetUsername)
     {
         var owner = authService.GetCurrentUser();
 
@@ -116,6 +116,8 @@ public class TaskAppFacade
             throw new Exception("Target user not found");
 
         new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, item.Id), target).Execute();
+        var item = itemManager.GetItem(authService.GetCurrentUser().Id, itemId);
+        var targetUser = authService.GetByUsername(targetUsername);
     }
     public List<IItem> GetAllItems()
     {
