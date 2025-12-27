@@ -86,9 +86,10 @@ public class TaskAppFacade
     {
         
     }
-    public void ShareItem(Guid id, string targetUsername)
+    public void ShareItem(Guid itemId, string targetUsername)
     {
-
+        var item = itemManager.GetItem(authService.GetCurrentUser().Id, itemId);
+        var targetUser = authService.GetByUsername(targetUsername);
     }
     public List<IItem> GetAllItems()
     {

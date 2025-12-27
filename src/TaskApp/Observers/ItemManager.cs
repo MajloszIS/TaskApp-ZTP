@@ -34,7 +34,10 @@ public class ItemManager : IItemObservable
     {
 
     }
-
+    public void ShareItem(User owner, User target, IItem item)
+    {
+        itemAccess.ShareItem(owner.Id, target.Id, item.Id);
+    }
     public IItem? GetItem(Guid userId,  Guid itemId)
     {
         return itemAccess.GetItem(userId, itemId);
