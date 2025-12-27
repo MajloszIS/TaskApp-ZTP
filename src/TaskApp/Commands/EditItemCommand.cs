@@ -14,8 +14,8 @@ public class EditItemCommand : ItemCommandBase
     private string newTitle;
     private string newData;
 
-    public EditItemCommand(ItemManager itemManager, IItemAccess itemAccess, User user, IItem item, string title, string data)
-        : base(itemManager, itemAccess, user, item)
+    public EditItemCommand(ItemManager itemManager, User user, IItem item, string title, string data)
+        : base(itemManager, user, item)
     {
         this.newTitle = item.Title;
         this.newData = data;

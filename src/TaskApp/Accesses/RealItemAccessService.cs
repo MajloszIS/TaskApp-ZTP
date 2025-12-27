@@ -8,11 +8,9 @@ namespace TaskApp.Access;
 public class RealItemAccessService : IItemAccess
 {
     private readonly IItemRepository itemRepo;
-    private readonly IUserRepository userRepo;
-    public RealItemAccessService(IItemRepository itemRepo, IUserRepository userRepo)
+    public RealItemAccessService(IItemRepository itemRepo)
     {
         this.itemRepo = itemRepo;
-        this.userRepo = userRepo;
     }
     public IItem GetItem(Guid userId, Guid itemId)
     {
@@ -27,6 +25,10 @@ public class RealItemAccessService : IItemAccess
     public void SaveItem(Guid userId, IItem item)
     {
         itemRepo.Update(userId, item);
+    }
+    public void DeleteItem(Guid userId, IItem item)
+    {
+        itemRepo.Delete(userId, item);
     }
     public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
     {

@@ -10,16 +10,13 @@ public class TaskAppFacade
     private readonly AuthService authService;
     private readonly ItemManager itemManager;
     private readonly CommandHistory history;
-    private readonly IItemAccess itemAccess;
     private readonly ItemQueryService queryService;
     public TaskAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
         authService = new AuthService(userRepo);
         itemManager = new ItemManager(itemRepo);
         history = new CommandHistory();
-        itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo, userRepo));
         queryService = new ItemQueryService(itemRepo);
-
     }
     public void Register(string username, string password)
     {   
@@ -40,7 +37,7 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var note = new Note(title, content);
-        new AddItemCommand(itemManager, itemAccess, authService.GetCurrentUser()!, note).Execute();
+        new AddItemCommand(itemManager, authService.GetCurrentUser()!, note).Execute();
     }
     public void AddTask(string title, DateTime dueDate, int priority)
     {
@@ -53,7 +50,7 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var task = new Tasky(title, dueDate, priority);
-        new AddItemCommand(itemManager, itemAccess, authService.GetCurrentUser(), task).Execute();
+        new AddItemCommand(itemManager, authService.GetCurrentUser(), task).Execute();
     }
     public void EditItem(Guid id, string newTitle, string newContent)
     {
@@ -70,14 +67,14 @@ public class TaskAppFacade
             throw new Exception("No user is logged in");
         }
         
-        var item = itemAccess.GetItem(authService.GetCurrentUser().Id, itemId);
+        var item = itemManager.GetItem(authService.GetCurrentUser().Id, itemId);
 
         if(item == null)
         {
             throw new Exception("Item not found");
         }
         
-        new DeleteItemCommand(itemManager, itemAccess, authService.GetCurrentUser(), item).Execute();
+        new DeleteItemCommand(itemManager, authService.GetCurrentUser(), item).Execute();
     }
     public void DeleteItemByTitle(string title)
     {
@@ -93,8 +90,8 @@ public class TaskAppFacade
         {
             throw new Exception("No user is logged in");
         }
-        var userId = authService.GetCurrentUser().Id;
-        var userItems = itemAccess.GetItemsForUser(userId);
+        var user = authService.GetCurrentUser();
+        var userItems = itemManager.GetAllItems(user);
         items.AddRange(userItems);
     }
     public List<IItem> FilterItems(string criteria)

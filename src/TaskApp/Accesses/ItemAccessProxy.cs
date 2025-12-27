@@ -38,6 +38,14 @@ public class ItemAccessProxy : IItemAccess
         }
         innerService.SaveItem(userId, item);
     }
+    public void DeleteItem(Guid userId, IItem item)
+    {
+        if(userId != currentUser.Id)
+        {
+            throw new Exception("Cannot delete item for another user");
+        }
+        innerService.DeleteItem(userId, item);
+    }
     public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
     {
         if(ownerId != currentUser.Id)

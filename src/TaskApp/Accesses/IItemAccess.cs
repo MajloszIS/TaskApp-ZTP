@@ -9,5 +9,6 @@ public interface IItemAccess
     IItem GetItem(Guid userId, Guid itemId);
     List<IItem> GetItemsForUser(Guid userId);
     void SaveItem(Guid userId, IItem item);
+    void DeleteItem(Guid userId, IItem item);
     void ShareItem(Guid ownerId, Guid targetId, Guid itemId);
 }
