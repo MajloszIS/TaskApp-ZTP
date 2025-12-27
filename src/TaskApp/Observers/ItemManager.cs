@@ -20,12 +20,12 @@ public class ItemManager : IItemObservable
 
     public void AddItem(User user, IItem item)
     {
-
+        repo.Add(user.Id, item);
     }
 
     public void RemoveItem(User user, IItem item)
     {
-
+        repo.Delete(user.Id, item);
     }
 
     public void UpdateItem(User user, IItem item)
@@ -36,6 +36,7 @@ public class ItemManager : IItemObservable
     public List<IItem> GetAllItems(User user)
     {
         var list = new List<IItem>();
+        
         return list;
     }
 
