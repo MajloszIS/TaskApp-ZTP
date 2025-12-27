@@ -26,6 +26,10 @@ public class TaskAppFacade
     { 
         return authService.Login(username, password);
     }
+    public void Logout()
+    {
+        authService.Logout();
+    } 
     public void AddNote(string title, string content)
     {
         if(authService.GetCurrentUser() == null)
@@ -37,6 +41,7 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var note = new Note(title, content);
+        note.Owners.Add(authService.GetCurrentUser());
         new AddItemCommand(itemManager, authService.GetCurrentUser()!, note).Execute();
     }
     public void AddTask(string title, DateTime dueDate, int priority)
@@ -50,6 +55,7 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var task = new Tasky(title, dueDate, priority);
+        task.Owners.Add(authService.GetCurrentUser());
         new AddItemCommand(itemManager, authService.GetCurrentUser(), task).Execute();
     }
     public void EditItem(Guid id, string newTitle, string newContent)
@@ -84,15 +90,14 @@ public class TaskAppFacade
     {
 
     }
-    public void GetAllItems(List<IItem> items)
+    public List<IItem> GetAllItems()
     {
-        if(authService.GetCurrentUser() == null)
+        var user = authService.GetCurrentUser();
+        if(user == null)
         {
             throw new Exception("No user is logged in");
         }
-        var user = authService.GetCurrentUser();
-        var userItems = itemManager.GetAllItems(user);
-        items.AddRange(userItems);
+        return itemManager.GetAllItems(user);
     }
     public List<IItem> FilterItems(string criteria)
     {

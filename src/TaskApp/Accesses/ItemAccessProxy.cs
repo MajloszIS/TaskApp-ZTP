@@ -24,10 +24,6 @@ public class ItemAccessProxy : IItemAccess
     }
     public List<IItem> GetItemsForUser(Guid userId)
     {
-        if(userId != currentUser.Id)
-        {
-            throw new Exception("Cannot access items of another user");
-        }
         var items = innerService.GetItemsForUser(userId);
         return items;
     }

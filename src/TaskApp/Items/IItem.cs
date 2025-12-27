@@ -7,5 +7,6 @@ public interface IItem
     Guid Id { get; }
     string Title { get; set; }
     DateTime CreatedAt { get; }
+    List<User> Owners { get; set; }
     IItem Clone();
 }
