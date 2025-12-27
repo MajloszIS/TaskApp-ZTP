@@ -7,19 +7,21 @@ namespace TaskApp.Access;
 public class ItemAccessProxy : IItemAccess
 {
     private readonly IItemAccess innerService;
-    private User? currentUser { set; get; }
+    private User? currentUser;
+
     public ItemAccessProxy(IItemAccess innerService)
     {
         this.innerService = innerService;
-
     }
-    public IItem GetItem(Guid userId, Guid itemId)
+
+    public void SetCurrentUser(User user)
     {
-        var item = innerService.GetItem(userId, itemId);
-        if(item.Owners.Find(u => u.Id == userId) == null)
-        {
-            throw new Exception("Cannot access items of another user");
-        }
+        currentUser = user;
+    }
+    public IItem GetItemById(Guid itemId)
+    {
+        var item = innerService.GetItemById(itemId);
+    
         return item;
     }
     public IItem GetItemByTitle(string title)
@@ -27,33 +29,29 @@ public class ItemAccessProxy : IItemAccess
         var item = innerService.GetItemByTitle(title);
         return item;
     }
-    public List<IItem> GetItemsForUser(Guid userId)
+    public List<IItem> GetAllItemsForUser(User user)
     {
-        var items = innerService.GetItemsForUser(userId);
+        var items = innerService.GetAllItemsForUser(user);
         return items;
     }
-    public void SaveItem(Guid userId, IItem item)
+    public void AddItem(IItem item)
     {
-        /*if(userId != currentUser.Id)
-        {
-            throw new Exception("Cannot save item for another user");
-        }*/
-        innerService.SaveItem(userId, item);
+        innerService.AddItem(item);
     }
-    public void DeleteItem(Guid userId, IItem item)
+    public void UpdateItem(IItem item)
     {
-        if(userId != currentUser.Id)
-        {
-            throw new Exception("Cannot delete item for another user");
-        }
-        innerService.DeleteItem(userId, item);
+        innerService.UpdateItem(item);
     }
-    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
+    public void DeleteItem(IItem item)
     {
-        /*if(ownerId != currentUser.Id)
-        {
-            throw new Exception("Only the owner can share the item");
-        }*/
-        innerService.ShareItem(ownerId, targetId, itemId);
+        innerService.DeleteItem(item);
+    }
+    public void ShareItem(User user, User targetUser, IItem item)
+    {
+        innerService.ShareItem(user, targetUser, item);
+    }
+    public void UnShareItem(User user, User targetUser, IItem item)
+    {
+        innerService.UnShareItem(user, targetUser, item);
     }
 }

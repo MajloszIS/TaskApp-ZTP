@@ -14,37 +14,52 @@ public class RealItemAccessService : IItemAccess
         this.itemRepo = itemRepo;
         this.userRepo = userRepo;
     }
-    public IItem GetItem(Guid userId, Guid itemId)
+    public IItem GetItemById(Guid itemId)
     {
-        var item = itemRepo.GetById(itemId);
-        return item;
+        return itemRepo.GetItemById(itemId);
     }
     public IItem GetItemByTitle(string title)
     {
-        return itemRepo.GetByTitle(title);
+        return itemRepo.GetItemByTitle(title);
     }
-    public List<IItem> GetItemsForUser(Guid userId)
+    public List<IItem> GetAllItemsForUser(User user)
     {
-        var items = itemRepo.GetAllForUser(userId);
-        return items;
+        return itemRepo.GetAllItemsForUser(user); 
     }
-    public void SaveItem(Guid userId, IItem item)
+    public void AddItem(IItem item)
     {
-        itemRepo.Add(userId, item);
+        itemRepo.AddItem(item);
     }
-    public void DeleteItem(Guid userId, IItem item)
+    public void UpdateItem(IItem item)
     {
-        itemRepo.Delete(userId, item);
+        itemRepo.UpdateItem(item);
     }
-    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
+    public void DeleteItem(IItem item)
     {
-        var item = itemRepo.GetById(itemId);
-        var owner = userRepo.GetById(ownerId);
-        var target = userRepo.GetById(targetId);
-        if (!item.Owners.Contains(owner))
+        itemRepo.DeleteItem(item);
+    }
+    public void ShareItem(User user, User targetUser, IItem item)
+    {
+        if (!item.Owners.Contains(user))
         {
-            throw new Exception("You don't have access to this item");
+            throw new Exception("User does not own the item");
         }
-        item.Owners.Add(target);
+        if (item.Owners.Contains(targetUser))
+        {
+            throw new Exception("Item already shared with target user");
+        }
+        item.Owners.Add(targetUser);
+    }
+    public void UnShareItem(User user, User targetUser, IItem item)
+    {
+        if (!item.Owners.Contains(user))
+        {
+            throw new Exception("User does not own the item");
+        }
+        if (item.Owners.Contains(targetUser))
+        {
+            throw new Exception("Item already shared with target user");
+        }
+        item.Owners.Remove(targetUser);
     }
 }

@@ -17,7 +17,7 @@ public class AuthService
         }
 
         var newUser = new User(username, password);
-        userRepository.Add(newUser);
+        userRepository.AddUser(newUser);
     }
     public bool Login(string username, string password)
     {
@@ -25,7 +25,7 @@ public class AuthService
         {
             throw new Exception("Username and password cannot be empty");
         }
-        var user = userRepository.GetByUsername(username);
+        var user = userRepository.GetUserByUsername(username);
         if(user.PasswordHash == password)
         {
             currentUser = user;
@@ -51,6 +51,6 @@ public class AuthService
     }
     public User GetByUsrn(string username)
     {
-        return userRepository.GetByUsername(username);
+        return userRepository.GetUserByUsername(username);
     }
 }
