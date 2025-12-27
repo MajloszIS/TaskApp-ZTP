@@ -10,6 +10,14 @@ public class Program
 {
     public static void Main()
     {
-        //...
+        var userrepo = new UserRepository();
+        var itemrepo = new ItemRepository();
+        var cosik = new TaskAppFacade(userrepo, itemrepo);
+
+        cosik.Register("alice", "password123");
+        cosik.Login("alice", "password123");
+        cosik.AddNote("Sample Note", "This is the content of the sample note.");
+        cosik.AddTask("Sample Task", DateTime.Now.AddDays(7), 1);
+        
     }
 }

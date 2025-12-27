@@ -13,6 +13,12 @@ public class CloneItemCommand : ItemCommandBase
 {
     private ItemGroup targetGroup;
 
+    public CloneItemCommand(ItemManager itemManager, IItemAccess itemAccess, User user, IItem item, ItemGroup? targetGroup)
+        : base(itemManager, itemAccess, user, item)
+    {
+        this.targetGroup = targetGroup;
+    }
+
     public override void Execute() { }
     public override void Undo() { }
 }

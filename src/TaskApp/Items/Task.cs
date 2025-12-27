@@ -2,25 +2,25 @@ using System;
 
 namespace TaskApp.Items;
 
-public class Task : ItemBase
+public class Tasky : ItemBase
 {
     public bool IsCompleted { get; set; }
     public DateTime DueDate;
     public int Priority;
 
-    public Task()
+    public Tasky(string title, DateTime dueDate, int priority)
+            :base(title)
     {
-        
+        this.IsCompleted = false;
+        this.DueDate = dueDate;
+        this.Priority = priority;
     }
 
     public override IItem Clone()
     {
-        return new Task
+        return new Tasky(this.Title, this.DueDate, this.Priority)
         {
-            IsCompleted = this.IsCompleted,
-            DueDate = this.DueDate,
-            Priority = this.Priority,
-            Title = this.Title
+            IsCompleted = this.IsCompleted
         };
     }
 }

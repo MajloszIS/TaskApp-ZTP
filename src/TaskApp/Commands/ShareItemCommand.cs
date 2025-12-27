@@ -11,7 +11,13 @@ namespace TaskApp.Commands;
 
 public class ShareItemCommand : ItemCommandBase
 {
-    private User targetUser;
+    private User? targetUser;
+
+    public ShareItemCommand(ItemManager itemManager, IItemAccess itemAccess, User user, IItem item, User targetUser)
+        :base(itemManager, itemAccess, user, item)
+    {
+        this.targetUser = targetUser;
+    }
 
     public override void Execute() { }
     public override void Undo() { }

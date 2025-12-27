@@ -6,7 +6,8 @@ public class ItemGroup : ItemBase
 {
     private List<IItem> Children { get; }
 
-    public ItemGroup(List<IItem> items)
+    public ItemGroup(List<IItem> items):
+        base(title: "Group")
     {
         Children = items;
     }
