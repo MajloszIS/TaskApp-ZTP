@@ -24,7 +24,7 @@ public class RealItemAccessService : IItemAccess
     }
     public void SaveItem(Guid userId, IItem item)
     {
-        itemRepo.Update(userId, item);
+        itemRepo.Add(userId, item);
     }
     public void DeleteItem(Guid userId, IItem item)
     {
