@@ -25,10 +25,13 @@ public class TaskAppFacade
     }
     public bool Login(string username, string password) 
     { 
-        return authService.Login(username, password);
+        bool result = authService.Login(username, password);
+        itemManager.SetCurrentUser(authService.GetCurrentUser());
+        return result;
     }
     public void Logout()
     {
+        itemManager.SetCurrentUser(null);
         authService.Logout();
     } 
     public void AddNote(string title, string content)
@@ -74,7 +77,7 @@ public class TaskAppFacade
             throw new Exception("No user is logged in");
         }
         
-        var item = itemManager.GetItem(authService.GetCurrentUser().Id, itemId);
+        var item = itemManager.GetItemById(itemId);
 
         if(item == null)
         {
@@ -99,7 +102,7 @@ public class TaskAppFacade
         if (target == null)
             throw new Exception("Target user not found");
 
-        new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, itemId), target).Execute();
+        new ShareItemCommand(itemManager, owner, itemManager.GetItemById(itemId), target).Execute();
     }
     public void ShareItemByTitle(string title, string targetUsername)
     {

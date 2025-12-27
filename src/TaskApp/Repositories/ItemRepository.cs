@@ -7,67 +7,73 @@ namespace TaskApp.Repository;
 
 public class ItemRepository : IItemRepository
 {
-    private Dictionary<Guid, List<IItem>> itemsByUser;
+    private List<IItem> _items;
     public ItemRepository()
     {
-        itemsByUser = new Dictionary<Guid, List<IItem>>();
+        _items = new List<IItem>();
     }
-    public IItem GetById(Guid userId)
+    public IItem GetItemById(Guid itemId)
     {
-        foreach (var userItems in itemsByUser.Values)
+        foreach (var item in _items)
         {
-            foreach (var item in userItems)
+            if (item.Id == itemId)
             {
-                if (item.Id == userId)
-                {
-                    return item;
-                }
+                return item;
             }
         }
         throw new Exception("Item not found");
     }
-    public IItem GetByTitle(string title)
+    public IItem GetItemByTitle(string title)
     {
-        foreach (var userItems in itemsByUser.Values)
+        foreach (var item in _items)
         {
-            foreach (var item in userItems)
+            if (item.Title.Equals(title))
             {
-                if (item.Title.Equals(title))
-                {
-                    return item;
-                }
+                return item;
             }
         }
         throw new Exception("Item not found");
     }
-    public List<IItem> GetAllForUser(Guid userId)
+    public List<IItem> GetAllItemsForUser(User user)
     {
-        var userList = itemsByUser[userId];
+        var userList = new List<IItem>();
+        foreach (var item in _items)
+        {
+            if (item.Owners.Contains(user))
+            {
+                userList.Add(item);
+            }
+        }
         return userList;
     }
-    public void Add(Guid userId, IItem item)
+    public void AddItem(IItem item)
     {
-        if (!itemsByUser.ContainsKey(userId))
+        if (_items.Contains(item))
         {
-            itemsByUser[userId] = new List<IItem>();
+            throw new Exception("Item already exists");
         }
-        itemsByUser[userId].Add(item);
+        _items.Add(item);
     }
-    public void Update(Guid userId, IItem item)
+    public void UpdateItem(IItem item)
     {
-        if (!itemsByUser.ContainsKey(userId))
+        if (!_items.Contains(item))
         {
-            throw new Exception("User has no items");
+            throw new Exception("Item does not exist");
         }
-        itemsByUser[userId].Remove(item);
-        itemsByUser[userId].Add(item);
+        _items.Remove(item);
+        _items.Add(item); 
     }
-    public void Delete(Guid userId, IItem item)
+    public void DeleteItem(IItem item)
     {
-        if (!itemsByUser.ContainsKey(userId))
+        if (!_items.Contains(item))
         {
-            throw new Exception("User has no items");
+            throw new Exception("Item does not exist");
         }
-        itemsByUser[userId].Remove(item);
+        _items.Remove(item);
+    }
+    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
+    {
+        // Implementation for sharing an item can be added here if needed
+        
     }
 }

@@ -11,7 +11,7 @@ public class UserRepository : IUserRepository
     {
         _users = new List<User>();
     }
-    public User GetById(Guid id)
+    public User GetUserById(Guid id)
     {
         if(id == Guid.Empty)
         {
@@ -28,7 +28,7 @@ public class UserRepository : IUserRepository
 
         throw new Exception("User not found");
     }
-    public User GetByUsername(string username)
+    public User GetUserByUsername(string username)
     {
         if(string.IsNullOrWhiteSpace(username))
         {
@@ -45,7 +45,7 @@ public class UserRepository : IUserRepository
 
         throw new Exception("User not found");
     }
-    public void Add(User user)
+    public void AddUser(User user)
     {
         if(user == null)
         {
