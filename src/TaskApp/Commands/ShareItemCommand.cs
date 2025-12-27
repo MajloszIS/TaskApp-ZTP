@@ -13,8 +13,8 @@ public class ShareItemCommand : ItemCommandBase
 {
     private User? targetUser;
 
-    public ShareItemCommand(ItemManager itemManager, IItemAccess itemAccess, User user, IItem item, User targetUser)
-        :base(itemManager, itemAccess, user, item)
+    public ShareItemCommand(ItemManager itemManager, User user, IItem item, User targetUser)
+        :base(itemManager,  user, item)
     {
         this.targetUser = targetUser;
     }

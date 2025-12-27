@@ -11,6 +11,7 @@ public class ItemAccessProxy : IItemAccess
     public ItemAccessProxy(IItemAccess innerService)
     {
         this.innerService = innerService;
+
     }
     public IItem GetItem(Guid userId, Guid itemId)
     {
@@ -32,11 +33,19 @@ public class ItemAccessProxy : IItemAccess
     }
     public void SaveItem(Guid userId, IItem item)
     {
-        if(userId != currentUser.Id)
+        /*if(userId != currentUser.Id)
         {
             throw new Exception("Cannot save item for another user");
-        }
+        }*/
         innerService.SaveItem(userId, item);
+    }
+    public void DeleteItem(Guid userId, IItem item)
+    {
+        if(userId != currentUser.Id)
+        {
+            throw new Exception("Cannot delete item for another user");
+        }
+        innerService.DeleteItem(userId, item);
     }
     public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
     {

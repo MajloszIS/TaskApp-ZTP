@@ -13,8 +13,8 @@ public class CloneItemCommand : ItemCommandBase
 {
     private ItemGroup targetGroup;
 
-    public CloneItemCommand(ItemManager itemManager, IItemAccess itemAccess, User user, IItem item, ItemGroup? targetGroup)
-        : base(itemManager, itemAccess, user, item)
+    public CloneItemCommand(ItemManager itemManager, User user, IItem item, ItemGroup? targetGroup)
+        : base(itemManager, user, item)
     {
         this.targetGroup = targetGroup;
     }

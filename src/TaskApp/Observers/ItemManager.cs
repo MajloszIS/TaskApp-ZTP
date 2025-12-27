@@ -11,21 +11,23 @@ namespace TaskApp.Observer;
 public class ItemManager : IItemObservable
 {
     private readonly List<IItemObserver> observers = new();
+    private readonly IItemAccess itemAccess;
     private readonly IItemRepository repo;
 
     public ItemManager(IItemRepository repo)
     {
         this.repo = repo;
+        itemAccess = new ItemAccessProxy(new RealItemAccessService(repo));
     }
 
     public void AddItem(User user, IItem item)
     {
-        repo.Add(user.Id, item);
+        itemAccess.SaveItem(user.Id, item);
     }
 
     public void RemoveItem(User user, IItem item)
     {
-        repo.Delete(user.Id, item);
+        itemAccess.DeleteItem(user.Id, item);
     }
 
     public void UpdateItem(User user, IItem item)
@@ -33,10 +35,14 @@ public class ItemManager : IItemObservable
 
     }
 
+    public IItem? GetItem(Guid userId,  Guid itemId)
+    {
+        return itemAccess.GetItem(userId, itemId);
+    }
+
     public List<IItem> GetAllItems(User user)
     {
-        var list = new List<IItem>();
-        
+        var list = itemAccess.GetItemsForUser(user.Id);
         return list;
     }
 
