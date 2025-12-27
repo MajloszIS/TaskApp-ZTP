@@ -13,7 +13,6 @@ public class Note : ItemBase
         this.Content = content;
         this.Tags = new List<string>();
     }
-
     public override IItem Clone()
     {
         return new Note(this.Title, this.Content ?? "");

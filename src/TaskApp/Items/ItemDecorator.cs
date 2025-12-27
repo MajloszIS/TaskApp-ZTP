@@ -5,6 +5,11 @@ namespace TaskApp.Items;
 public abstract class ItemDecorator : IItem
 {
     protected IItem innerItem;
+    List<User> IItem.Owners
+    {
+        get => innerItem.Owners;
+        set => innerItem.Owners = value;
+    }
 
     public Guid Id => innerItem.Id;
     public string Title { get => innerItem.Title; set => innerItem.Title = value; }
