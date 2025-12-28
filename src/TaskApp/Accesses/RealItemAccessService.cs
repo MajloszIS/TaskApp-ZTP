@@ -8,11 +8,9 @@ namespace TaskApp.Access;
 public class RealItemAccessService : IItemAccess
 {
     private readonly IItemRepository itemRepo;
-    private readonly IUserRepository userRepo;
-    public RealItemAccessService(IItemRepository itemRepo, IUserRepository userRepo)
+    public RealItemAccessService(IItemRepository itemRepo)
     {
         this.itemRepo = itemRepo;
-        this.userRepo = userRepo;
     }
     public IItem GetItemById(Guid itemId)
     {
@@ -40,26 +38,10 @@ public class RealItemAccessService : IItemAccess
     }
     public void ShareItem(User user, User targetUser, IItem item)
     {
-        if (!item.Owners.Contains(user))
-        {
-            throw new Exception("User does not own the item");
-        }
-        if (item.Owners.Contains(targetUser))
-        {
-            throw new Exception("Item already shared with target user");
-        }
         item.Owners.Add(targetUser);
     }
     public void UnShareItem(User user, User targetUser, IItem item)
     {
-        if (!item.Owners.Contains(user))
-        {
-            throw new Exception("User does not own the item");
-        }
-        if (item.Owners.Contains(targetUser))
-        {
-            throw new Exception("Item already shared with target user");
-        }
         item.Owners.Remove(targetUser);
     }
 }

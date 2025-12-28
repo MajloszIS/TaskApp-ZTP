@@ -13,9 +13,9 @@ public class ItemManager : IItemObservable
     private readonly List<IItemObserver> observers = new();
     private readonly ItemAccessProxy itemAccess;
 
-    public ItemManager(IItemRepository itemRepo, IUserRepository userRepo)
+    public ItemManager(IItemRepository itemRepo)
     {
-        itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo, userRepo));
+        itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo));
     }
 
     public IItem? GetItemById(Guid itemId)
@@ -46,7 +46,7 @@ public class ItemManager : IItemObservable
     {
         itemAccess.ShareItem(user, targetUser, item);
     }
-    public void SetCurrentUser(User user)
+    public void SetCurrentUser(User? user)
     {
         itemAccess.SetCurrentUser(user);
     }
