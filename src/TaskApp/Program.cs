@@ -22,7 +22,7 @@ public class Program
 
         cosik.Login("alice", "password123");
         cosik.AddNote("Another Note", "Content for another note.");
-        cosik.Login("alice", "password123");
+        cosik.Logout();
 
         cosik.Register("bob", "securepass");
         cosik.Login("bob", "securepass");
@@ -41,6 +41,6 @@ public class Program
         {
             Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}");
         }
-        cosik.Login("alice", "password123");
+
     }
 }

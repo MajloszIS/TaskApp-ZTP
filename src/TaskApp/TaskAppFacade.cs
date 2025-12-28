@@ -15,7 +15,7 @@ public class TaskAppFacade
     public TaskAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
         authService = new AuthService(userRepo);
-        itemManager = new ItemManager(itemRepo, userRepo);
+        itemManager = new ItemManager(itemRepo);
         history = new CommandHistory();
         queryService = new ItemQueryService(itemRepo);
     }
@@ -45,8 +45,7 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var note = new Note(title, content);
-        note.Owners.Add(authService.GetCurrentUser());
-        new AddItemCommand(itemManager, authService.GetCurrentUser()!, note).Execute();
+        new AddItemCommand(itemManager, authService.GetCurrentUser(), note).Execute();
     }
     public void AddTask(string title, DateTime dueDate, int priority)
     {
@@ -59,7 +58,6 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var task = new Tasky(title, dueDate, priority);
-        task.Owners.Add(authService.GetCurrentUser());
         new AddItemCommand(itemManager, authService.GetCurrentUser(), task).Execute();
     }
     public void EditItem(Guid id, string newTitle, string newContent)
@@ -118,7 +116,7 @@ public class TaskAppFacade
         if (target == null)
             throw new Exception("Target user not found");
 
-        new ShareItemCommand(itemManager, owner, itemManager.GetItem(owner.Id, item.Id), target).Execute();
+        new ShareItemCommand(itemManager, owner, itemManager.GetItemById(item.Id), target).Execute();
     }
     public List<IItem> GetAllItems()
     {
@@ -127,7 +125,7 @@ public class TaskAppFacade
         {
             throw new Exception("No user is logged in");
         }
-        return itemManager.GetAllItems(user);
+        return itemManager.GetAllItemsForUser(user);
     }
     public List<IItem> FilterItems(string criteria)
     {
