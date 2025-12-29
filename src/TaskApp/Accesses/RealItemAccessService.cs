@@ -36,11 +36,11 @@ public class RealItemAccessService : IItemAccess
     {
         itemRepo.DeleteItem(item);
     }
-    public void ShareItem(User user, User targetUser, IItem item)
+    public void ShareItem(User targetUser, IItem item)
     {
         item.Owners.Add(targetUser);
     }
-    public void UnShareItem(User user, User targetUser, IItem item)
+    public void UnShareItem(User targetUser, IItem item)
     {
         item.Owners.Remove(targetUser);
     }

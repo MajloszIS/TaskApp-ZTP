@@ -27,7 +27,7 @@ public class Program
         cosik.Register("bob", "securepass");
         cosik.Login("bob", "securepass");
         cosik.AddTask("Bob's Task", DateTime.Now.AddDays(3), 2);
-        cosik.ShareItemByTitle("Bob's Task", "alice");
+        cosik.ShareItem("Bob's Task", "alice");
 
         var bobItems = cosik.GetAllItems();
         foreach(var item in bobItems)
@@ -41,6 +41,7 @@ public class Program
         {
             Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}");
         }
+        cosik.DeleteItem("Bob's Task");
 
     }
 }

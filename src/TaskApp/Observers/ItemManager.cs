@@ -42,9 +42,9 @@ public class ItemManager : IItemObservable
     {
         itemAccess.DeleteItem(item);
     }
-    public void ShareItem(User user, User targetUser, IItem item)
+    public void ShareItem(User targetUser, IItem item)
     {
-        itemAccess.ShareItem(user, targetUser, item);
+        itemAccess.ShareItem(targetUser, item);
     }
     public void SetCurrentUser(User? user)
     {

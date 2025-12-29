@@ -12,6 +12,6 @@ public interface IItemAccess
     void AddItem(IItem item);
     void UpdateItem(IItem item);
     void DeleteItem(IItem item);
-    void ShareItem(User user, User targetUser, IItem item);
-    void UnShareItem(User user, User targetUser, IItem item);
+    void ShareItem(User targetUser, IItem item);
+    void UnShareItem(User targetUser, IItem item);
 }

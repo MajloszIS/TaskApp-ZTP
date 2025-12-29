@@ -36,10 +36,6 @@ public class TaskAppFacade
     } 
     public void AddNote(string title, string content)
     {
-        if(authService.GetCurrentUser() == null)
-        {
-            throw new Exception("No user is logged in");
-        }
         if(string.IsNullOrEmpty(title))
         {
             throw new Exception("Title cannot be empty");
@@ -49,10 +45,6 @@ public class TaskAppFacade
     }
     public void AddTask(string title, DateTime dueDate, int priority)
     {
-        if(authService.GetCurrentUser() == null)
-        {
-            throw new Exception("No user is logged in");
-        }
         if(string.IsNullOrEmpty(title))
         {
             throw new Exception("Title cannot be empty");
@@ -68,55 +60,15 @@ public class TaskAppFacade
     {
 
     }
-    public void DeleteItemById(Guid itemId)
+    public void DeleteItem(string title)
     {
-        if(authService.GetCurrentUser() == null)
-        {
-            throw new Exception("No user is logged in");
-        }
-        
-        var item = itemManager.GetItemById(itemId);
-
-        if(item == null)
-        {
-            throw new Exception("Item not found");
-        }
-        
-        new DeleteItemCommand(itemManager, authService.GetCurrentUser(), item).Execute();
+        new DeleteItemCommand(itemManager, authService.GetCurrentUser(), itemManager.GetItemByTitle(title)).Execute();
     }
-    public void DeleteItemByTitle(string title)
+    public void ShareItem(string title, string targetUsername)
     {
-        
-    }
-    public void ShareItem(Guid itemId, string targetUsername)
-    {
+        var target = authService.GetByUsername(targetUsername);
         var owner = authService.GetCurrentUser();
-
-        if (owner == null)
-            throw new Exception("No user is logged in");
-
-        var target = authService.GetByUsrn(targetUsername);
-
-        if (target == null)
-            throw new Exception("Target user not found");
-
-        new ShareItemCommand(itemManager, owner, itemManager.GetItemById(itemId), target).Execute();
-    }
-    public void ShareItemByTitle(string title, string targetUsername)
-    {
-        var owner = authService.GetCurrentUser();
-
-        var item = itemManager.GetItemByTitle(title);
-
-        if (owner == null)
-            throw new Exception("No user is logged in");
-
-        var target = authService.GetByUsrn(targetUsername);
-
-        if (target == null)
-            throw new Exception("Target user not found");
-
-        new ShareItemCommand(itemManager, owner, itemManager.GetItemById(item.Id), target).Execute();
+        new ShareItemCommand(itemManager, owner, itemManager.GetItemByTitle(title), target).Execute();
     }
     public List<IItem> GetAllItems()
     {
