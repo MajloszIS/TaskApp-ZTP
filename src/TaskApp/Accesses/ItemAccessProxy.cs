@@ -65,7 +65,7 @@ public class ItemAccessProxy : IItemAccess
         EnsureLoggedInAndOwner(item);
         innerService.DeleteItem(item);
     }
-    public void ShareItem(User user, User targetUser, IItem item)
+    public void ShareItem(User targetUser, IItem item)
     {
         EnsureLoggedInAndOwner(item);
         if (targetUser == currentUser)
@@ -76,9 +76,9 @@ public class ItemAccessProxy : IItemAccess
         {
             throw new Exception("Item is already shared with the target user");
         }
-        innerService.ShareItem(user, targetUser, item);
+        innerService.ShareItem(targetUser, item);
     }
-    public void UnShareItem(User user, User targetUser, IItem item)
+    public void UnShareItem(User targetUser, IItem item)
     {
         EnsureLoggedInAndOwner(item);
         if (targetUser == currentUser)
@@ -89,6 +89,6 @@ public class ItemAccessProxy : IItemAccess
         {
             throw new Exception("Item is not shared with the target user");
         }
-        innerService.UnShareItem(user, targetUser, item);
+        innerService.UnShareItem(targetUser, item);
     }
 }
