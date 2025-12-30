@@ -8,43 +8,40 @@ namespace TaskApp.Access;
 public class RealItemAccessService : IItemAccess
 {
     private readonly IItemRepository itemRepo;
-    private readonly IUserRepository userRepo;
-    public RealItemAccessService(IItemRepository itemRepo, IUserRepository userRepo)
+    public RealItemAccessService(IItemRepository itemRepo)
     {
         this.itemRepo = itemRepo;
-        this.userRepo = userRepo;
     }
-    public IItem GetItem(Guid userId, Guid itemId)
+    public IItem GetItemById(Guid itemId)
     {
-        var item = itemRepo.GetById(itemId);
-        return item;
+        return itemRepo.GetItemById(itemId);
     }
     public IItem GetItemByTitle(string title)
     {
-        return itemRepo.GetByTitle(title);
+        return itemRepo.GetItemByTitle(title);
     }
-    public List<IItem> GetItemsForUser(Guid userId)
+    public List<IItem> GetAllItemsForUser(User user)
     {
-        var items = itemRepo.GetAllForUser(userId);
-        return items;
+        return itemRepo.GetAllItemsForUser(user); 
     }
-    public void SaveItem(Guid userId, IItem item)
+    public void AddItem(IItem item)
     {
-        itemRepo.Add(userId, item);
+        itemRepo.AddItem(item);
     }
-    public void DeleteItem(Guid userId, IItem item)
+    public void UpdateItem(IItem item)
     {
-        itemRepo.Delete(userId, item);
+        itemRepo.UpdateItem(item);
     }
-    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
+    public void DeleteItem(IItem item)
     {
-        var item = itemRepo.GetById(itemId);
-        var owner = userRepo.GetById(ownerId);
-        var target = userRepo.GetById(targetId);
-        if (!item.Owners.Contains(owner))
-        {
-            throw new Exception("You don't have access to this item");
-        }
-        item.Owners.Add(target);
+        itemRepo.DeleteItem(item);
+    }
+    public void ShareItem(User targetUser, IItem item)
+    {
+        item.Owners.Add(targetUser);
+    }
+    public void UnShareItem(User targetUser, IItem item)
+    {
+        item.Owners.Remove(targetUser);
     }
 }

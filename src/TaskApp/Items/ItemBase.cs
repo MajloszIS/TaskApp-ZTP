@@ -5,9 +5,9 @@ namespace TaskApp.Items;
 
 public abstract class ItemBase : IItem
 {
-    public Guid Id { get; protected set; }
+    public Guid Id { get; }
     public string Title { get; set; }
-    public DateTime CreatedAt { get; protected set; }
+    public DateTime CreatedAt { get; }
     public List<User> Owners { get; set; }
 
     public ItemBase(string title)

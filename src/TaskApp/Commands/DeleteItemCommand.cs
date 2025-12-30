@@ -21,13 +21,13 @@ public class DeleteItemCommand : ItemCommandBase
         if (parentGroup != null)
             parentGroup.Remove(item);
         else
-            itemManager.RemoveItem(user, item);
+            itemManager.RemoveItem(item);
     }
     public override void Undo()
     {
         if (parentGroup != null)
             parentGroup.Add(item);
         else
-            itemManager.AddItem(user, item);
+            itemManager.AddItem(item);
     }
 }

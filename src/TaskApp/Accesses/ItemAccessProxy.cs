@@ -7,53 +7,88 @@ namespace TaskApp.Access;
 public class ItemAccessProxy : IItemAccess
 {
     private readonly IItemAccess innerService;
-    private User? currentUser { set; get; }
+    private User? currentUser;
+
     public ItemAccessProxy(IItemAccess innerService)
     {
         this.innerService = innerService;
-
     }
-    public IItem GetItem(Guid userId, Guid itemId)
+
+    private void EnsureLoggedInAndOwner(IItem item)
     {
-        var item = innerService.GetItem(userId, itemId);
-        if(item.Owners.Find(u => u.Id == userId) == null)
-        {
-            throw new Exception("Cannot access items of another user");
-        }
+        if (currentUser == null)
+            throw new Exception("No current user set");
+        if (!item.Owners.Contains(currentUser))
+            throw new Exception("Access denied to item");
+    }
+    public void SetCurrentUser(User? user)
+    {
+        currentUser = user;
+    }
+    public IItem GetItemById(Guid itemId)
+    {
+        var item = innerService.GetItemById(itemId);
+        EnsureLoggedInAndOwner(item);
         return item;
     }
     public IItem GetItemByTitle(string title)
     {
         var item = innerService.GetItemByTitle(title);
+        EnsureLoggedInAndOwner(item);
         return item;
     }
-    public List<IItem> GetItemsForUser(Guid userId)
+    public List<IItem> GetAllItemsForUser(User user)
     {
-        var items = innerService.GetItemsForUser(userId);
+        var items = innerService.GetAllItemsForUser(user);
+        foreach (var item in items)
+        {
+            if (!item.Owners.Contains(user))
+            {
+                throw new Exception("Access denied to item");
+            }
+        }
         return items;
     }
-    public void SaveItem(Guid userId, IItem item)
+    public void AddItem(IItem item)
     {
-        /*if(userId != currentUser.Id)
-        {
-            throw new Exception("Cannot save item for another user");
-        }*/
-        innerService.SaveItem(userId, item);
+        EnsureLoggedInAndOwner(item);
+        item.Owners.Add(currentUser);
+        innerService.AddItem(item);
     }
-    public void DeleteItem(Guid userId, IItem item)
+    public void UpdateItem(IItem item)
     {
-        if(userId != currentUser.Id)
+        EnsureLoggedInAndOwner(item);
+        innerService.UpdateItem(item);
+    }
+    public void DeleteItem(IItem item)
+    {
+        EnsureLoggedInAndOwner(item);
+        innerService.DeleteItem(item);
+    }
+    public void ShareItem(User targetUser, IItem item)
+    {
+        EnsureLoggedInAndOwner(item);
+        if (targetUser == currentUser)
         {
-            throw new Exception("Cannot delete item for another user");
+            throw new Exception("Owner cannot share the item with themselves");
         }
-        innerService.DeleteItem(userId, item);
-    }
-    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
-    {
-        /*if(ownerId != currentUser.Id)
+        if (item.Owners.Contains(targetUser))
         {
-            throw new Exception("Only the owner can share the item");
-        }*/
-        innerService.ShareItem(ownerId, targetId, itemId);
+            throw new Exception("Item is already shared with the target user");
+        }
+        innerService.ShareItem(targetUser, item);
+    }
+    public void UnShareItem(User targetUser, IItem item)
+    {
+        EnsureLoggedInAndOwner(item);
+        if (targetUser == currentUser)
+        {
+            throw new Exception("Owner cannot unshare the item from themselves");
+        }
+        if (!item.Owners.Contains(targetUser))
+        {
+            throw new Exception("Item is not shared with the target user");
+        }
+        innerService.UnShareItem(targetUser, item);
     }
 }

@@ -6,10 +6,12 @@ namespace TaskApp.Access;
 
 public interface IItemAccess
 {
-    IItem GetItem(Guid userId, Guid itemId);
+    IItem GetItemById(Guid itemId);
     IItem GetItemByTitle(string title);
-    List<IItem> GetItemsForUser(Guid userId);
-    void SaveItem(Guid userId, IItem item);
-    void DeleteItem(Guid userId, IItem item);
-    void ShareItem(Guid ownerId, Guid targetId, Guid itemId);
+    List<IItem> GetAllItemsForUser(User user);
+    void AddItem(IItem item);
+    void UpdateItem(IItem item);
+    void DeleteItem(IItem item);
+    void ShareItem(User targetUser, IItem item);
+    void UnShareItem(User targetUser, IItem item);
 }

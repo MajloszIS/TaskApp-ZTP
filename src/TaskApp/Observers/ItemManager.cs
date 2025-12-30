@@ -11,51 +11,45 @@ namespace TaskApp.Observer;
 public class ItemManager : IItemObservable
 {
     private readonly List<IItemObserver> observers = new();
-    private readonly IItemAccess itemAccess;
-    private readonly IItemRepository itemRepo;
-    private readonly IUserRepository userRepo;
+    private readonly ItemAccessProxy itemAccess;
 
-    public ItemManager(IItemRepository itemRepo, IUserRepository userRepo)
+    public ItemManager(IItemRepository itemRepo)
     {
-        this.itemRepo = itemRepo;
-        this.userRepo = userRepo;
-
-        itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo, userRepo));
+        itemAccess = new ItemAccessProxy(new RealItemAccessService(itemRepo));
     }
 
-    public void AddItem(User user, IItem item)
+    public IItem? GetItemById(Guid itemId)
     {
-        itemAccess.SaveItem(user.Id, item);
-    }
-
-    public void RemoveItem(User user, IItem item)
-    {
-        itemAccess.DeleteItem(user.Id, item);
-    }
-
-    public void UpdateItem(User user, IItem item)
-    {
-
-    }
-    public void ShareItem(User owner, User target, IItem item)
-    {
-        itemAccess.ShareItem(owner.Id, target.Id, item.Id);
-    }
-    public IItem? GetItem(Guid userId,  Guid itemId)
-    {
-        return itemAccess.GetItem(userId, itemId);
+        return itemAccess.GetItemById(itemId);
     }
     public IItem? GetItemByTitle(string title)
     {
         return itemAccess.GetItemByTitle(title);
     }
-
-    public List<IItem> GetAllItems(User user)
+    public List<IItem> GetAllItemsForUser(User user)
     {
-        var list = itemAccess.GetItemsForUser(user.Id);
-        return list;
+        return itemAccess.GetAllItemsForUser(user);
     }
-
+    public void AddItem(IItem item)
+    {
+        itemAccess.AddItem(item);
+    }
+    public void UpdateItem(IItem item)
+    {
+        itemAccess.UpdateItem(item);
+    }
+    public void RemoveItem(IItem item)
+    {
+        itemAccess.DeleteItem(item);
+    }
+    public void ShareItem(User targetUser, IItem item)
+    {
+        itemAccess.ShareItem(targetUser, item);
+    }
+    public void SetCurrentUser(User? user)
+    {
+        itemAccess.SetCurrentUser(user);
+    }
     public void Attach(IItemObserver observer)
     {
 

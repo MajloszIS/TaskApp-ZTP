@@ -4,7 +4,7 @@ namespace TaskApp.Repository;
 
 public interface IUserRepository
 {
-    User GetById(Guid id);
-    User GetByUsername(string username);
-    void Add(User user);
+    User GetUserById(Guid id);
+    User GetUserByUsername(string username);
+    void AddUser(User user);
 }
