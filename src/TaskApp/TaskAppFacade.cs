@@ -66,7 +66,7 @@ public class TaskAppFacade
     }
     public void ShareItem(string title, string targetUsername)
     {
-        var target = authService.GetByUsername(targetUsername);
+        var target = authService.GetUserByUsername(targetUsername);
         var owner = authService.GetCurrentUser();
         new ShareItemCommand(itemManager, owner, itemManager.GetItemByTitle(title), target).Execute();
     }
