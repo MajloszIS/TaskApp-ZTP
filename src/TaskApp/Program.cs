@@ -28,14 +28,27 @@ public class Program
         cosik.Login("bob", "securepass");
         cosik.AddTask("Bob's Task", DateTime.Now.AddDays(3), 2);
         cosik.ShareItemByTitle("Bob's Task", "alice");
+        cosik.CloneItemByTitle("Bob's Task");
 
         var bobItems = cosik.GetAllItems();
-        foreach(var item in bobItems)
+        foreach (var item in bobItems)
         {
-            Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}, onwers: {item.Owners[0].Username}, {item.Owners[1].Username} ");
+            string ownersList = "";
+            int ownerzy = 0;
+            foreach (var owner in item.Owners)
+            {
+                if (ownerzy > 0)
+                {
+                    ownersList += ", ";
+                }
+                ownersList += owner.Username;
+                ownerzy++;
+            }
+            Console.WriteLine($"Item: {item.Title}, Type: {item.GetType().Name}, owners: {ownersList}");
         }
         cosik.Logout();
         cosik.Login("alice", "password123");
+        cosik.CloneItemByTitle("Sample Note");
         var items = cosik.GetAllItems();
         foreach (var item in items)
         {

@@ -15,6 +15,11 @@ public class Note : ItemBase
     }
     public override IItem Clone()
     {
-        return new Note(this.Title, this.Content ?? "");
+        var clone = new Note(this.Title, this.Content ?? "");
+        if (this.Tags != null)
+        {
+            clone.Tags = new List<string>(this.Tags);
+        }
+        return clone;
     }
 }
