@@ -14,16 +14,16 @@ public class ItemAccessProxy : IItemAccess
         this.innerService = innerService;
     }
 
-    public void SetCurrentUser(User? user)
-    {
-        currentUser = user;
-    }
     private void EnsureLoggedInAndOwner(IItem item)
     {
         if (currentUser == null)
             throw new Exception("No current user set");
         if (!item.Owners.Contains(currentUser))
             throw new Exception("Access denied to item");
+    }
+    public void SetCurrentUser(User? user)
+    {
+        currentUser = user;
     }
     public IItem GetItemById(Guid itemId)
     {

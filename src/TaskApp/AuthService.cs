@@ -49,7 +49,7 @@ public class AuthService
         }
         return currentUser;
     }
-    public User GetByUsername(string username)
+    public User GetUserByUsername(string username)
     {
         return userRepository.GetUserByUsername(username);
     }
