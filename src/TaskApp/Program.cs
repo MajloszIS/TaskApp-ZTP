@@ -27,13 +27,8 @@ public class Program
         cosik.Register("bob", "securepass");
         cosik.Login("bob", "securepass");
         cosik.AddTask("Bob's Task", DateTime.Now.AddDays(3), 2);
-<<<<<<< HEAD
-        cosik.ShareItemByTitle("Bob's Task", "alice");
-        cosik.CloneItemByTitle("Bob's Task");
-=======
         cosik.ShareItem("Bob's Task", "alice");
->>>>>>> main
-
+        cosik.CloneItem("Bob's Task");
         var bobItems = cosik.GetAllItems();
         foreach (var item in bobItems)
         {
@@ -52,7 +47,7 @@ public class Program
         }
         cosik.Logout();
         cosik.Login("alice", "password123");
-        cosik.CloneItemByTitle("Sample Note");
+        cosik.CloneItem("Sample Note");
         var items = cosik.GetAllItems();
         foreach (var item in items)
         {

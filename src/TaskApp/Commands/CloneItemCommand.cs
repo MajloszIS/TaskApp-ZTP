@@ -29,7 +29,7 @@ public class CloneItemCommand : ItemCommandBase
         if (targetGroup != null)
             targetGroup.Add(clonedItem);
         else
-            itemManager.AddItem(user, clonedItem);
+            itemManager.AddItem(clonedItem);
     }
     public override void Undo() 
     {
@@ -37,6 +37,6 @@ public class CloneItemCommand : ItemCommandBase
         if (targetGroup != null)
             targetGroup.Remove(clonedItem);
         else
-            itemManager.RemoveItem(user, clonedItem);
+            itemManager.RemoveItem(clonedItem);
     }
 }

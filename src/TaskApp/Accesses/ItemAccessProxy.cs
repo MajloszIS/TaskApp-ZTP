@@ -51,8 +51,14 @@ public class ItemAccessProxy : IItemAccess
     }
     public void AddItem(IItem item)
     {
-        EnsureLoggedInAndOwner(item);
-        item.Owners.Add(currentUser);
+        if (currentUser == null)
+        {
+            throw new Exception("No user is logged in.");
+        }
+        if (!item.Owners.Contains(currentUser))
+        {
+            item.Owners.Add(currentUser);
+        }
         innerService.AddItem(item);
     }
     public void UpdateItem(IItem item)
