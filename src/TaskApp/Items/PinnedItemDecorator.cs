@@ -8,5 +8,8 @@ public class PinnedItemDecorator : ItemDecorator
 
     public PinnedItemDecorator(IItem innerItem) : base(innerItem) { }
 
-    public override IItem Clone() { return null; }
+    public override IItem Clone() 
+    { 
+        return null;
+    }
 }

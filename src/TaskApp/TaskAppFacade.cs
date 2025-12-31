@@ -56,9 +56,19 @@ public class TaskAppFacade
     {
 
     }
-    public void CloneItem(Guid id)
+    public void CloneItem(string title)
     {
-
+        var user = authService.GetCurrentUser();
+        if (user == null)
+        {
+            throw new Exception("No user is logged in");
+        }
+        var originalItem = itemManager.GetItemByTitle(title);
+        if (originalItem == null)
+        {
+            throw new Exception("Item not found");
+        }
+        new CloneItemCommand(itemManager, user, originalItem, null).Execute();
     }
     public void DeleteItem(string title)
     {
