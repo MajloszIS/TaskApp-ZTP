@@ -16,6 +16,8 @@ public class ItemChangeEvent
 
     public ItemChangeEvent(string changeType, IItem item, User user)
     {
-
+        ChangeType = changeType;
+        Item = item;
+        User = user;
     }
 }
