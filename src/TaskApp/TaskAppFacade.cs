@@ -107,4 +107,12 @@ public class TaskAppFacade
     {
 
     }
+    public void AttachObserver(IItemObserver observer)
+    {
+        itemManager.Attach(observer);
+    }
+    public void DetachObserver(IItemObserver observer)
+    {
+        itemManager.Detach(observer);
+    }
 }

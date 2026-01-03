@@ -13,6 +13,6 @@ public class ItemsListView : IItemObserver
 {
     public void Update(ItemChangeEvent evt)
     {
-
+        Console.WriteLine($"[WIDOK LISTY] {evt.User.Username} wykonał: {evt.ChangeType} na '{evt.Item.Title}'. Odświeżam listę...");
     }
 }

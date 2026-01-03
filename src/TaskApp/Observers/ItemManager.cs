@@ -10,8 +10,9 @@ namespace TaskApp.Observer;
 
 public class ItemManager : IItemObservable
 {
-    private readonly List<IItemObserver> observers = new();
+    private readonly List<IItemObserver> observers = new List<IItemObserver>();
     private readonly ItemAccessProxy itemAccess;
+    private User? currentUser;
 
     public ItemManager(IItemRepository itemRepo)
     {
@@ -33,14 +34,22 @@ public class ItemManager : IItemObservable
     public void AddItem(IItem item)
     {
         itemAccess.AddItem(item);
+        var user = currentUser ?? new User("System", "");
+        Notify(new ItemChangeEvent("DODANO", item, user));
     }
     public void UpdateItem(IItem item)
     {
         itemAccess.UpdateItem(item);
+
+        var user = currentUser ?? new User("System", "");
+        Notify(new ItemChangeEvent("ZAKTUALIZOWANO", item, user));
     }
     public void RemoveItem(IItem item)
     {
         itemAccess.DeleteItem(item);
+
+        var user = currentUser ?? new User("System", "");
+        Notify(new ItemChangeEvent("USUNIĘTO", item, user));
     }
     public void ShareItem(User targetUser, IItem item)
     {
@@ -48,20 +57,24 @@ public class ItemManager : IItemObservable
     }
     public void SetCurrentUser(User? user)
     {
+        currentUser = user;
         itemAccess.SetCurrentUser(user);
     }
     public void Attach(IItemObserver observer)
     {
-
+        observers.Add(observer);
     }
 
     public void Detach(IItemObserver observer)
     {
-
+        observers.Remove(observer);
     }
 
     public void Notify(ItemChangeEvent evt)
     {
-
+        foreach (var observer in observers)
+        {
+            observer.Update(evt);
+        }
     }
 }

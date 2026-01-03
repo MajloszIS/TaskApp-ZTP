@@ -14,6 +14,13 @@ public class Program
         var itemrepo = new ItemRepository();
         var cosik = new TaskAppFacade(userrepo, itemrepo);
 
+        var view = new ItemsListView();
+        var notif = new NotificationService();
+
+        cosik.AttachObserver(view);
+        cosik.AttachObserver(notif);
+        Console.WriteLine("Obserwatorzy podpięci\n");
+
         cosik.Register("alice", "password123");
         cosik.Login("alice", "password123");
         cosik.AddNote("Sample Note", "This is the content of the sample note.");
