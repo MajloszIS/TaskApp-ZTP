@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using TaskApp.Commands;
 using TaskApp.Items;
 using TaskApp.Observer;
 using TaskApp.Access;
 using TaskApp.Repository;
-//niektóre trzeba usunąc, nie wszystkie są potrzebne
+
 
 namespace TaskApp.Commands;
 
@@ -14,7 +12,7 @@ public abstract class ItemCommandBase : ICommand
     protected IItem item;
     protected ItemManager itemManager;
     protected User user;
-    protected ItemMemento? backup; //todo
+    protected ItemMemento? backup;
 
     public ItemCommandBase(ItemManager itemManager, User user, IItem item)
     {
@@ -23,6 +21,15 @@ public abstract class ItemCommandBase : ICommand
         this.user = user;
     }
 
+    protected void CreateBackup()
+    {
+        string content = "";
+        if (item is Note note)
+        {
+            content = note.Content ?? string.Empty;
+        }
+        backup = new ItemMemento(item.Id, item.Title, content);
+    }
     public abstract void Execute();
     public abstract void Undo();
 }
