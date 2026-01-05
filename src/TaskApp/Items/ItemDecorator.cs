@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TaskApp.Items;
 
@@ -20,5 +21,13 @@ public abstract class ItemDecorator : IItem
         this.innerItem = innerItem;
     }
 
-    public abstract IItem Clone();
+    public virtual IItem Clone()
+    {
+        return innerItem.Clone();
+    }
+
+    public IItem GetInnerItem()
+    {
+        return innerItem;
+    }
 }
