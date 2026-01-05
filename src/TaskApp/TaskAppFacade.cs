@@ -70,6 +70,32 @@ public class TaskAppFacade
         }
         new CloneItemCommand(itemManager, user, originalItem, null).Execute();
     }
+
+    public void PinItem(string title)
+    {
+        var user = authService.GetCurrentUser();
+        if (user == null) throw new Exception("No user is logged in");
+        var item = itemManager.GetItemByTitle(title);
+        if (item == null) throw new Exception("Item not found");
+        if (item is PinnedItemDecorator) return;
+        itemManager.RemoveItem(item);
+        var pinned = new PinnedItemDecorator(item);
+        itemManager.AddItem(pinned);
+    }
+
+    public void UnpinItem(string title)
+    {
+        var user = authService.GetCurrentUser();
+        if (user == null) throw new Exception("No user is logged in");
+        var item = itemManager.GetItemByTitle(title);
+        if (item == null) throw new Exception("Item not found");
+        if (item is PinnedItemDecorator pid)
+        {
+            itemManager.RemoveItem(pid);
+            var inner = pid.GetInnerItem();
+            itemManager.AddItem(inner);
+        }
+    }
     public void DeleteItem(string title)
     {
         new DeleteItemCommand(itemManager, authService.GetCurrentUser(), itemManager.GetItemByTitle(title)).Execute();
