@@ -73,28 +73,14 @@ public class TaskAppFacade
 
     public void PinItem(string title)
     {
-        var user = authService.GetCurrentUser();
-        if (user == null) throw new Exception("No user is logged in");
         var item = itemManager.GetItemByTitle(title);
-        if (item == null) throw new Exception("Item not found");
-        if (item is PinnedItemDecorator) return;
-        itemManager.RemoveItem(item);
-        var pinned = new PinnedItemDecorator(item);
-        itemManager.AddItem(pinned);
+        new PinItemCommand(itemManager, authService.GetCurrentUser(), item, false).Execute();
     }
 
     public void UnpinItem(string title)
     {
-        var user = authService.GetCurrentUser();
-        if (user == null) throw new Exception("No user is logged in");
         var item = itemManager.GetItemByTitle(title);
-        if (item == null) throw new Exception("Item not found");
-        if (item is PinnedItemDecorator pid)
-        {
-            itemManager.RemoveItem(pid);
-            var inner = pid.GetInnerItem();
-            itemManager.AddItem(inner);
-        }
+        new PinItemCommand(itemManager, authService.GetCurrentUser(), item, true).Execute();
     }
     public void DeleteItem(string title)
     {

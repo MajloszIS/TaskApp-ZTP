@@ -25,6 +25,20 @@ public class Program
         cosik.Login("alice", "password123");
         cosik.AddNote("Sample Note", "This is the content of the sample note.");
         cosik.AddTask("Sample Task", DateTime.Now.AddDays(7), 1);
+        cosik.PinItem("Sample Note");
+        var pinnedItems = cosik.GetAllItems();
+        Console.WriteLine("After pin:");
+        foreach (var it in pinnedItems)
+        {
+            Console.WriteLine($"Item: {it.Title}, Type: {it.GetType().Name}");
+        }
+        cosik.UnpinItem("Sample Note");
+        var afterUnpin = cosik.GetAllItems();
+        Console.WriteLine("After unpin:");
+        foreach (var it in afterUnpin)
+        {
+            Console.WriteLine($"Item: {it.Title}, Type: {it.GetType().Name}");
+        }
         cosik.Logout();
 
         cosik.Login("alice", "password123");
