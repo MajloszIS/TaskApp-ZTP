@@ -7,6 +7,7 @@ namespace TaskApp.Access;
 public class ItemAccessProxy : IItemAccess
 {
     private readonly IItemAccess innerService;
+    private List<IItem> cachedItems = new List<IItem>();
     private User? currentUser;
 
     public ItemAccessProxy(IItemAccess innerService)
@@ -23,19 +24,43 @@ public class ItemAccessProxy : IItemAccess
     }
     public void SetCurrentUser(User? user)
     {
+        if (user == null)
+        {
+            cachedItems.Clear();
+        }
         currentUser = user;
     }
     public IItem GetItemById(Guid itemId)
     {
-        var item = innerService.GetItemById(itemId);
-        EnsureLoggedInAndOwner(item);
-        return item;
+        if (cachedItems.Exists(i => i.Id == itemId))
+        {
+            var cachedItem = cachedItems.Find(i => i.Id == itemId)!;
+            EnsureLoggedInAndOwner(cachedItem);
+            return cachedItem;
+        }
+        else
+        {
+            var item = innerService.GetItemById(itemId);
+            EnsureLoggedInAndOwner(item);
+            cachedItems.Add(item);
+            return item;
+        }
     }
     public IItem GetItemByTitle(string title)
     {
-        var item = innerService.GetItemByTitle(title);
-        EnsureLoggedInAndOwner(item);
-        return item;
+        if (cachedItems.Exists(i => i.Title == title))
+        {
+            var cachedItem = cachedItems.Find(i => i.Title == title)!;
+            EnsureLoggedInAndOwner(cachedItem);
+            return cachedItem;
+        }
+        else
+        {
+            var item = innerService.GetItemByTitle(title);
+            EnsureLoggedInAndOwner(item);
+            cachedItems.Add(item);
+            return item;
+        }
     }
     public List<IItem> GetAllItemsForUser(User user)
     {
@@ -64,11 +89,19 @@ public class ItemAccessProxy : IItemAccess
     public void UpdateItem(IItem item)
     {
         EnsureLoggedInAndOwner(item);
+        if (cachedItems.Exists(i => i.Id == item.Id))
+        {
+            cachedItems.RemoveAll(i => i.Id == item.Id);
+        }
         innerService.UpdateItem(item);
     }
     public void DeleteItem(IItem item)
     {
         EnsureLoggedInAndOwner(item);
+        if (cachedItems.Exists(i => i.Id == item.Id))
+        {
+            cachedItems.RemoveAll(i => i.Id == item.Id);
+        }
         innerService.DeleteItem(item);
     }
     public void ShareItem(User targetUser, IItem item)
@@ -82,6 +115,10 @@ public class ItemAccessProxy : IItemAccess
         {
             throw new Exception("Item is already shared with the target user");
         }
+        if (cachedItems.Exists(i => i.Id == item.Id))
+        {
+                cachedItems.RemoveAll(i => i.Id == item.Id);
+        }
         innerService.ShareItem(targetUser, item);
     }
     public void UnShareItem(User targetUser, IItem item)
@@ -94,6 +131,10 @@ public class ItemAccessProxy : IItemAccess
         if (!item.Owners.Contains(targetUser))
         {
             throw new Exception("Item is not shared with the target user");
+        }
+        if (cachedItems.Exists(i => i.Id == item.Id))
+        {
+            cachedItems.RemoveAll(i => i.Id == item.Id);
         }
         innerService.UnShareItem(targetUser, item);
     }
