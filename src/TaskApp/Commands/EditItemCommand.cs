@@ -1,26 +1,42 @@
 using System;
-using System.Collections.Generic;
-using TaskApp.Commands;
 using TaskApp.Items;
 using TaskApp.Observer;
 using TaskApp.Access;
 using TaskApp.Repository;
-//niektóre trzeba usunąc, nie wszystkie są potrzebne
 
 namespace TaskApp.Commands;
 
 public class EditItemCommand : ItemCommandBase
 {
     private string newTitle;
-    private string newData;
+    private string newContent;
 
-    public EditItemCommand(ItemManager itemManager, User user, IItem item, string title, string data)
+    public EditItemCommand(ItemManager itemManager, User user, IItem item, string title, string content)
         : base(itemManager, user, item)
     {
-        this.newTitle = item.Title;
-        this.newData = data;
+        this.newTitle = title; 
+        this.newContent = content;
     }
 
-    public override void Execute() { }
-    public override void Undo() { }
+    public override void Execute()
+    {
+        CreateBackup();
+        item.Title = newTitle;
+        if(item is Note note)
+        {
+            note.Content = newContent;
+        }
+
+        itemManager.UpdateItem(item);
+    }
+    public override void Undo()
+    {
+        item.Title = backup.title;
+        if(item is Note note)
+        {
+            note.Content = backup.datasnapshot;
+        }
+
+        itemManager.UpdateItem(item);
+    }
 }

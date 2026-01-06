@@ -54,7 +54,22 @@ public class TaskAppFacade
     }
     public void EditItem(Guid id, string newTitle, string newContent)
     {
+        var user = authService.GetCurrentUser();
+        var allItems = itemManager.GetAllItemsForUser(user);
+        IItem foundItem = null;
+        foreach (var item in allItems)
+        {
+            if (item.Id == id)
+            {
+                foundItem = item;
+                break;
+            }
+        }
+        if (foundItem == null){
+            throw new Exception("Item not found");
+            }
 
+        var command = new EditItemCommand(itemManager, user, foundItem, newTitle, newContent);
     }
     public void CloneItem(string title)
     {

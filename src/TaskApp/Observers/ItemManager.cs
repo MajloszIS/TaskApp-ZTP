@@ -77,4 +77,9 @@ public class ItemManager : IItemObservable
             observer.Update(evt);
         }
     }
+
+    public void UnShareItem(User target, IItem item)
+    {
+        itemAccess.UnShareItem(target, item);
+    }
 }
