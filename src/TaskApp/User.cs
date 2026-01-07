@@ -2,13 +2,17 @@
 
 public class User
 {
-    public Guid Id { get; set; }
-    public string Username { get; set; }
-    public string PasswordHash { get; set; }
-    public User(string username, string passwordHash)
+    public Guid Id { get; }
+    public string Username { get; }
+    private string Password { get; set; }
+    public User(string username, string password)
     {
         Id = Guid.NewGuid();
         Username = username;
-        PasswordHash = passwordHash;
+        Password = password;
+    }
+    public bool VerifyPassword(string password)
+    {
+        return this.Password == password;
     }
 }

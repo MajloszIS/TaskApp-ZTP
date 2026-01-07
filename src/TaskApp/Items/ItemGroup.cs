@@ -5,12 +5,12 @@ namespace TaskApp.Items;
 
 public class ItemGroup : ItemBase
 {
-    private List<IItem> Children { get; }
-
-    public ItemGroup(List<IItem> items)
-        : base(title: "Group")
+    public List<IItem> Children { get; }
+    
+    public ItemGroup(string title):
+        base(title: "Group")
     {
-        Children = items;
+        Children = new List<IItem>();
     }
 
     public void Add(IItem item)
@@ -29,7 +29,14 @@ public override IItem Clone()
 
     foreach (var item in Children)
     {
-        clonedChildren.Add(item.Clone());
+        var newGroup = new ItemGroup(this.Title);
+        foreach (var item in Children)
+        {
+            var childClone = item.Clone();
+            if (childClone != null) newGroup.Add(childClone);
+        }
+        newGroup.Title = this.Title;
+        return newGroup;
     }
 
     var newGroup = new ItemGroup(clonedChildren)

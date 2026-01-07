@@ -13,6 +13,10 @@ public class Note : ItemBase
         this.Content = content;
         this.Tags = new List<string>();
     }
+    public void AddTag(string tag)
+    {
+        Tags.Add(tag);
+    }
     public override IItem Clone()
     {
         var clone = new Note(this.Title, this.Content ?? "");
