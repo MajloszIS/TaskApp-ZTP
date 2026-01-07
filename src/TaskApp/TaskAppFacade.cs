@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using TaskApp.Access;
 using TaskApp.Commands;
@@ -10,13 +11,13 @@ public class TaskAppFacade
 {
     private readonly AuthService authService;
     private readonly ItemManager itemManager;
-    private readonly CommandHistory history;
+    private readonly Dictionary<Guid, CommandHistory> userHistories;
     private readonly ItemQueryService queryService;
     public TaskAppFacade(IUserRepository userRepo, IItemRepository itemRepo)
     {
         authService = new AuthService(userRepo);
         itemManager = new ItemManager(itemRepo);
-        history = new CommandHistory();
+        userHistories = new Dictionary<Guid, CommandHistory>();
         queryService = new ItemQueryService(itemRepo);
     }
     public void Register(string username, string password)
@@ -41,7 +42,8 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var note = new Note(title, content);
-        new AddItemCommand(itemManager, authService.GetCurrentUser(), note).Execute();
+        var command = new AddItemCommand(itemManager, authService.GetCurrentUser(), note);
+        GetHistoryForCurrentUser().Execute(command);
     }
     public void AddTask(string title, DateTime dueDate, int priority)
     {
@@ -50,7 +52,8 @@ public class TaskAppFacade
             throw new Exception("Title cannot be empty");
         }
         var task = new Tasky(title, dueDate, priority);
-        new AddItemCommand(itemManager, authService.GetCurrentUser(), task).Execute();
+        var command = new AddItemCommand(itemManager, authService.GetCurrentUser(), task);
+        GetHistoryForCurrentUser().Execute(command);
     }
     public void EditItem(Guid id, string newTitle, string newContent)
     {
@@ -70,6 +73,7 @@ public class TaskAppFacade
             }
 
         var command = new EditItemCommand(itemManager, user, foundItem, newTitle, newContent);
+        GetHistoryForCurrentUser().Execute(command);
     }
     public void CloneItem(string title)
     {
@@ -83,7 +87,8 @@ public class TaskAppFacade
         {
             throw new Exception("Item not found");
         }
-        new CloneItemCommand(itemManager, user, originalItem, null).Execute();
+        var command = new CloneItemCommand(itemManager, user, originalItem, null);
+        GetHistoryForCurrentUser().Execute(command);
     }
 
     public void PinItem(string title)
@@ -105,7 +110,8 @@ public class TaskAppFacade
     {
         var target = authService.GetUserByUsername(targetUsername);
         var owner = authService.GetCurrentUser();
-        new ShareItemCommand(itemManager, owner, itemManager.GetItemByTitle(title), target).Execute();
+        var command = new ShareItemCommand(itemManager, owner, itemManager.GetItemByTitle(title), target);
+        GetHistoryForCurrentUser().Execute(command);
     }
     public List<IItem> GetAllItems()
     {
@@ -128,11 +134,11 @@ public class TaskAppFacade
     }
     public void Undo()
     {
-
+        GetHistoryForCurrentUser().Undo();
     }
     public void Redo()
     {
-
+        GetHistoryForCurrentUser().Redo();
     }
     public void AttachObserver(IItemObserver observer)
     {
@@ -141,5 +147,17 @@ public class TaskAppFacade
     public void DetachObserver(IItemObserver observer)
     {
         itemManager.Detach(observer);
+    }
+
+    private CommandHistory GetHistoryForCurrentUser()
+    {
+        var user = authService.GetCurrentUser();
+        
+        if (!userHistories.ContainsKey(user.Id))
+        {
+            userHistories[user.Id] = new CommandHistory();
+        }
+
+        return userHistories[user.Id];
     }
 }
