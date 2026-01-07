@@ -71,9 +71,5 @@ public class ItemRepository : IItemRepository
         }
         _items.Remove(item);
     }
-    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
-    {
-        // Implementation for sharing an item can be added here if needed
-        
-    }
+    
 }
