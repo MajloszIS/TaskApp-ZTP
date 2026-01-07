@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using TaskApp.Commands;
 using TaskApp.Items;
 using TaskApp.Observer;
@@ -29,7 +30,10 @@ public class ItemManager : IItemObservable
     }
     public List<IItem> GetAllItemsForUser(User user)
     {
-        return itemAccess.GetAllItemsForUser(user);
+        var items = itemAccess.GetAllItemsForUser(user);
+        return items
+            .OrderByDescending(i => i is PinnedItemDecorator)
+            .ToList();
     }
     public void AddItem(IItem item)
     {
