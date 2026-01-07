@@ -58,21 +58,25 @@ public class TaskAppFacade
         .Execute();
 }
 
-public void AddItemToFolder(Guid folderId, Guid itemId)
+public void AddItemToFolder(string folderTitle, string itemTitle)
 {
     var user = authService.GetCurrentUser();
     if (user == null)
         throw new Exception("No user logged in");
 
-    var folder = itemManager.GetItemById(folderId) as ItemGroup;
+    var folder = GetAllItems().Find(i => i is ItemGroup g && g.Title == folderTitle) as ItemGroup;
     if (folder == null)
-        throw new Exception("Folder not found");
+        throw new Exception($"Folder '{folderTitle}' not found");
 
-    var item = itemManager.GetItemById(itemId);
+    var item = GetAllItems().Find(i => i.Title == itemTitle);
     if (item == null)
-        throw new Exception("Item not found");
+        throw new Exception($"Item '{itemTitle}' not found");
 
+    folder.Add(item);
+    itemManager.UpdateItem(folder);
 }
+
+
 
     public void AddTask(string title, DateTime dueDate, int priority)
     {

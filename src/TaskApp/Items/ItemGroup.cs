@@ -23,21 +23,24 @@ public class ItemGroup : ItemBase
         Children.Remove(item);
     }
 
-public override IItem Clone()
-{
-    var clonedChildren = new List<IItem>();
-
-    foreach (var item in Children)
+    public IReadOnlyList<IItem> GetChildren()
     {
-        clonedChildren.Add(item.Clone());
+        return Children.AsReadOnly();
     }
 
-    var newGroup = new ItemGroup(clonedChildren)
+    public override IItem Clone()
     {
-        Title = this.Title
-    };
+        var clonedChildren = new List<IItem>();
 
-    return newGroup;
-}
+        foreach (var item in Children)
+        {
+            clonedChildren.Add(item.Clone());
+        }
 
+        var newGroup = new ItemGroup(clonedChildren)
+        {
+            Title = this.Title
+        };
+        return newGroup;
+    }
 }

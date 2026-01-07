@@ -25,6 +25,25 @@ public class Program
         cosik.Login("alice", "password123");
         cosik.AddNote("Sample Note", "This is the content of the sample note.");
         cosik.AddTask("Sample Task", DateTime.Now.AddDays(7), 1);
+        cosik.CreateFolder("MyFolder");
+        cosik.AddItemToFolder("MyFolder", "Sample Note");
+
+
+        var folder = cosik.GetAllItems().Find(i => i.Title == "MyFolder") as ItemGroup;
+
+        if (folder != null)
+        {
+            Console.WriteLine($"Zawartość folderu '{folder.Title}':");
+            foreach (var item in folder.GetChildren())
+        {
+            Console.WriteLine($"- {item.Title} ({item.GetType().Name})");
+        }
+}
+else
+{
+    Console.WriteLine("Folder nie istnieje!");
+}
+
         cosik.PinItem("Sample Note");
         var pinnedItems = cosik.GetAllItems();
         Console.WriteLine("After pin:");
