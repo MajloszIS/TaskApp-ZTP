@@ -26,7 +26,7 @@ public class AuthService
             throw new Exception("Username and password cannot be empty");
         }
         var user = userRepository.GetUserByUsername(username);
-        if(user.PasswordHash == password)
+        if(user.VerifyPassword(password))
         {
             currentUser = user;
             return true;

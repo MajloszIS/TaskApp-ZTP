@@ -55,6 +55,15 @@ public class TaskAppFacade
         var command = new AddItemCommand(itemManager, authService.GetCurrentUser(), task);
         GetHistoryForCurrentUser().Execute(command);
     }
+    public void AddFolder(string title)
+    {
+        if (string.IsNullOrEmpty(title))
+        {
+            throw new Exception("Title cannot be empty");
+        }
+        var task = new ItemGroup(title);
+        new AddItemCommand(itemManager, authService.GetCurrentUser(), task).Execute();
+    }
     public void EditItem(Guid id, string newTitle, string newContent)
     {
         var user = authService.GetCurrentUser();
@@ -70,7 +79,7 @@ public class TaskAppFacade
         }
         if (foundItem == null){
             throw new Exception("Item not found");
-            }
+        }
 
         var command = new EditItemCommand(itemManager, user, foundItem, newTitle, newContent);
         GetHistoryForCurrentUser().Execute(command);
