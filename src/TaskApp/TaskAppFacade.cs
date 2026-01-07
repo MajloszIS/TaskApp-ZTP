@@ -45,6 +45,35 @@ public class TaskAppFacade
         var command = new AddItemCommand(itemManager, authService.GetCurrentUser(), note);
         GetHistoryForCurrentUser().Execute(command);
     }
+
+    public void CreateFolder(string title)
+{
+    if (string.IsNullOrEmpty(title))
+        throw new Exception("Folder title cannot be empty");
+
+    var folder = new ItemGroup(new List<IItem>());
+    folder.Title = title;
+
+    new AddItemCommand(itemManager, authService.GetCurrentUser(), folder)
+        .Execute();
+}
+
+public void AddItemToFolder(Guid folderId, Guid itemId)
+{
+    var user = authService.GetCurrentUser();
+    if (user == null)
+        throw new Exception("No user logged in");
+
+    var folder = itemManager.GetItemById(folderId) as ItemGroup;
+    if (folder == null)
+        throw new Exception("Folder not found");
+
+    var item = itemManager.GetItemById(itemId);
+    if (item == null)
+        throw new Exception("Item not found");
+
+}
+
     public void AddTask(string title, DateTime dueDate, int priority)
     {
         if(string.IsNullOrEmpty(title))
