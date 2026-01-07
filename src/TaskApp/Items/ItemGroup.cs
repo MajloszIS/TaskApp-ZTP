@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TaskApp.Items;
 
@@ -16,12 +17,17 @@ public class ItemGroup : ItemBase
     {
         Children.Add(item);
     }
+
     public void Remove(IItem item)
     {
         Children.Remove(item);
     }
 
-    public override IItem Clone()
+public override IItem Clone()
+{
+    var clonedChildren = new List<IItem>();
+
+    foreach (var item in Children)
     {
         var newGroup = new ItemGroup(this.Title);
         foreach (var item in Children)
@@ -32,4 +38,13 @@ public class ItemGroup : ItemBase
         newGroup.Title = this.Title;
         return newGroup;
     }
+
+    var newGroup = new ItemGroup(clonedChildren)
+    {
+        Title = this.Title
+    };
+
+    return newGroup;
+}
+
 }
