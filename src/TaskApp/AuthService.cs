@@ -1,5 +1,6 @@
 ﻿using System;
 using TaskApp.Repository;
+using TaskApp.Exceptions;
 
 public class AuthService
 {
@@ -13,7 +14,7 @@ public class AuthService
     {
         if(string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
-            throw new Exception("Username and password cannot be empty");
+            throw new ValidationException("Username and password cannot be empty.");
         }
 
         var newUser = new User(username, password);
@@ -23,7 +24,7 @@ public class AuthService
     {
         if(string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
-            throw new Exception("Username and password cannot be empty");
+            throw new ValidationException("Username and password cannot be empty.");
         }
         var user = userRepository.GetUserByUsername(username);
         if(user.VerifyPassword(password))
@@ -37,7 +38,7 @@ public class AuthService
     {
         if(currentUser == null)
         {
-            throw new Exception("No user is currently logged in");
+            throw new ValidationException("No user is currently logged in.");
         }
         currentUser = null;
     }
@@ -45,7 +46,7 @@ public class AuthService
     {
         if(currentUser == null)
         {
-            throw new Exception("No user is currently logged in");
+            throw new ValidationException("No user is currently logged in.");
         }
         return currentUser;
     }
