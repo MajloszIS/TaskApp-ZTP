@@ -15,7 +15,6 @@ public class Tasky : ItemBase
         this.DueDate = dueDate;
         this.Priority = priority;
     }
-
     public override IItem Clone()
     {
         return new Tasky(this.Title, this.DueDate, this.Priority)
