@@ -11,8 +11,8 @@ public class AddItemCommand : ItemCommandBase
 
     private ItemGroup? parentGroup;
 
-    public AddItemCommand(ItemManager itemManager, User user, IItem item, ItemGroup? parentGroup = null)
-        : base(itemManager, user, item)
+    public AddItemCommand(ItemManager itemManager, IItem item, ItemGroup? parentGroup = null)
+        : base(itemManager, item)
     {
         this.parentGroup = parentGroup;
     }

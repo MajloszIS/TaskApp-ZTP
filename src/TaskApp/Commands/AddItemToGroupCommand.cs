@@ -6,8 +6,8 @@ public class AddItemToGroupCommand : ItemCommandBase
 {
     private readonly ItemGroup parentGroup;
 
-    public AddItemToGroupCommand(User user, IItem item, ItemGroup parentGroup)
-        : base(null, user, item)
+    public AddItemToGroupCommand( IItem item, ItemGroup parentGroup)
+        : base(null, item)
     {
         this.parentGroup = parentGroup;
     }
