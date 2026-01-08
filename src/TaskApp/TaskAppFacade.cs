@@ -51,7 +51,7 @@ public class TaskAppFacade
     if (string.IsNullOrEmpty(title))
         throw new Exception("Folder title cannot be empty");
 
-    var folder = new ItemGroup(new List<IItem>());
+    var folder = new ItemGroup(title);
     folder.Title = title;
 
     new AddItemCommand(itemManager, authService.GetCurrentUser(), folder)

@@ -6,8 +6,8 @@ namespace TaskApp.Items;
 public class ItemGroup : ItemBase
 {
     public List<IItem> Children { get; }
-    
-    public ItemGroup(string title):
+
+    public ItemGroup(string title) :
         base(title: "Group")
     {
         Children = new List<IItem>();
@@ -23,28 +23,20 @@ public class ItemGroup : ItemBase
         Children.Remove(item);
     }
 
-public override IItem Clone()
-{
-    var clonedChildren = new List<IItem>();
-
-    foreach (var item in Children)
+    public override IItem Clone()
     {
         var newGroup = new ItemGroup(this.Title);
-        foreach (var item in Children)
-        {
-            var childClone = item.Clone();
-            if (childClone != null) newGroup.Add(childClone);
+        foreach (var item in Children) 
+        { 
+            var childClone = item.Clone(); 
+            if (childClone != null) 
+            {
+                newGroup.Add(childClone); 
+            }
         }
-        newGroup.Title = this.Title;
+        newGroup.Title = this.Title; 
         return newGroup;
     }
 
-    var newGroup = new ItemGroup(clonedChildren)
-    {
-        Title = this.Title
-    };
-
-    return newGroup;
-}
 
 }
