@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TaskApp.Exceptions;
 using TaskApp.Items;
 
 namespace TaskApp.Access;
@@ -18,9 +19,9 @@ public class ItemAccessProxy : IItemAccess
     private void EnsureLoggedInAndOwner(IItem item)
     {
         if (currentUser == null)
-            throw new Exception("No current user set");
+            throw new AccessDeniedException();
         if (!item.Owners.Contains(currentUser))
-            throw new Exception("Access denied to item");
+            throw new AccessDeniedException();
     }
     public void SetCurrentUser(User? user)
     {
@@ -109,11 +110,11 @@ public class ItemAccessProxy : IItemAccess
         EnsureLoggedInAndOwner(item);
         if (targetUser == currentUser)
         {
-            throw new Exception("Owner cannot share the item with themselves");
+            throw new ValidationException("Owner cannot share the item with themselves.");
         }
         if (item.Owners.Contains(targetUser))
         {
-            throw new Exception("Item is already shared with the target user");
+            throw new ValidationException("Item is already shared with the target user.");
         }
         if (cachedItems.Exists(i => i.Id == item.Id))
         {
@@ -126,11 +127,11 @@ public class ItemAccessProxy : IItemAccess
         EnsureLoggedInAndOwner(item);
         if (targetUser == currentUser)
         {
-            throw new Exception("Owner cannot unshare the item from themselves");
+            throw new ValidationException("Item is not shared with the target user.");
         }
         if (!item.Owners.Contains(targetUser))
         {
-            throw new Exception("Item is not shared with the target user");
+            throw new ValidationException("Item is not shared with the target user.");
         }
         if (cachedItems.Exists(i => i.Id == item.Id))
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TaskApp.Access;
 using TaskApp.Commands;
+using TaskApp.Exceptions;
 using TaskApp.Items;
 using TaskApp.Observer;
 using TaskApp.Repository;
@@ -39,7 +40,7 @@ public class TaskAppFacade
     {
         if(string.IsNullOrEmpty(title))
         {
-            throw new Exception("Title cannot be empty");
+            throw new ValidationException("Title cannot be empty.");
         }
         var note = new Note(title, content);
         var command = new AddItemCommand(itemManager, note);
@@ -159,7 +160,7 @@ public void AddItemToFolder(Guid folderId, Guid itemId)
         var user = authService.GetCurrentUser();
         if(user == null)
         {
-            throw new Exception("No user is logged in");
+            throw new AccessDeniedException();
         }
         return itemManager.GetAllItemsForUser(user);
     }
