@@ -10,8 +10,8 @@ public class ShareItemCommand : ItemCommandBase
 {
     private User? targetUser;
 
-    public ShareItemCommand(ItemManager itemManager, User user, IItem item, User targetUser)
-        :base(itemManager,  user, item)
+    public ShareItemCommand(ItemManager itemManager, IItem item, User targetUser)
+        :base(itemManager, item)
     {
         this.targetUser = targetUser;
     }
@@ -20,5 +20,8 @@ public class ShareItemCommand : ItemCommandBase
     {
         itemManager.ShareItem(targetUser, item);
     }
-    public override void Undo() { }
+    public override void Undo()
+    {
+        itemManager.UnShareItem(targetUser, item);
+    }
 }

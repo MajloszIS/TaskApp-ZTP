@@ -9,8 +9,8 @@ public class DeleteItemCommand : ItemCommandBase
 {
     private ItemGroup? parentGroup;
     
-    public DeleteItemCommand(ItemManager itemManager, User user, IItem item, ItemGroup? parentGroup = null)
-        : base(itemManager, user, item)
+    public DeleteItemCommand(ItemManager itemManager, IItem item, ItemGroup? parentGroup = null)
+        : base(itemManager, item)
     {
         this.parentGroup = parentGroup;
     }
