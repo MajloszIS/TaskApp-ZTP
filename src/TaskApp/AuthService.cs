@@ -12,7 +12,7 @@ public class AuthService
     }
     public void Register(string username, string password)
     {
-        if(string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
             throw new ValidationException("Username and password cannot be empty.");
         }
@@ -20,23 +20,18 @@ public class AuthService
         var newUser = new User(username, password);
         userRepository.AddUser(newUser);
     }
-    public bool Login(string username, string password)
+    public void Login(string username, string password)
     {
-        if(string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-        {
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             throw new ValidationException("Username and password cannot be empty.");
-        }
         var user = userRepository.GetUserByUsername(username);
-        if(user.VerifyPassword(password))
-        {
-            currentUser = user;
-            return true;
-        }
-        return false;
+        if (!user.VerifyPassword(password))
+            throw new InvalidCredentialsException();
+        currentUser = user;
     }
     public void Logout()
     {
-        if(currentUser == null)
+        if (currentUser == null)
         {
             throw new ValidationException("No user is currently logged in.");
         }
@@ -44,7 +39,7 @@ public class AuthService
     }
     public User GetCurrentUser()
     {
-        if(currentUser == null)
+        if (currentUser == null)
         {
             throw new ValidationException("No user is currently logged in.");
         }

@@ -25,11 +25,10 @@ public class TaskAppFacade
     {   
         authService.Register(username, password);
     }
-    public bool Login(string username, string password) 
+    public void Login(string username, string password) 
     { 
-        bool result = authService.Login(username, password);
+        authService.Login(username, password);
         itemManager.SetCurrentUser(authService.GetCurrentUser());
-        return result;
     }
     public void Logout()
     {
