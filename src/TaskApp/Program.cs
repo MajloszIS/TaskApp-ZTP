@@ -1,16 +1,37 @@
 ﻿using System;
+using TaskApp.Exceptions;
 using TaskApp.Repository;
 
 
 public class Program
 {
+    static void AddNote(TaskAppFacade app)
+    {
+        Console.WriteLine("= Add Note =\n");
+        Console.WriteLine("Title: ");
+        var title = Console.ReadLine();
+
+        Console.WriteLine("Content: ");
+        var content = Console.ReadLine();
+
+        try
+        {
+            app.AddNote(title, content);
+            Console.WriteLine("Note added successfully");
+        }
+        catch (TaskAppException ex)
+        {
+            Console.WriteLine(ex.Message);
+            Pause();
+        }
+    }
     static void Register(TaskAppFacade app)
     {
-        Console.Write("= Register =\n");
-        Console.Write("Username: ");
+        Console.WriteLine("= Register =\n");
+        Console.WriteLine("Username: ");
         var username = Console.ReadLine();
 
-        Console.Write("Password: ");
+        Console.WriteLine("Password: ");
         var password = Console.ReadLine();
 
         try
@@ -18,34 +39,34 @@ public class Program
             app.Register(username, password);
             Console.WriteLine("User registered successfully");
         }
-        catch (Exception ex)
+        catch (TaskAppException ex)
         {
             Console.WriteLine(ex.Message);
+            Pause();
         }
     }
 
     static bool Login(TaskAppFacade app)
     {
-        Console.Write("= Login =\n");
-        Console.Write("Username: ");
+        Console.WriteLine("= Login =\n");
+        Console.WriteLine("Username: ");
         var username = Console.ReadLine();
 
-        Console.Write("Password: ");
+        Console.WriteLine("Password: ");
         var password = Console.ReadLine();
 
         try
         {
-            if (app.Login(username, password))
-            {
-                Console.WriteLine("Login successful");
-                return true;
-            }
+            app.Login(username, password);
+            Console.WriteLine("Login successful");
+            return true;
         }
-        catch (Exception ex)
+        catch (TaskAppException ex)
         {
             Console.WriteLine(ex.Message);
+            Pause();
+            return false;
         }
-        return false;
     }
 
     static void UserMenu(TaskAppFacade app)
@@ -58,14 +79,14 @@ public class Program
             Console.WriteLine("2. Add task");
             Console.WriteLine("3. Show my items");
             Console.WriteLine("4. Logout");
-            Console.Write("Choice: ");
+            Console.WriteLine("Choice: ");
 
             var choice = Console.ReadLine();
 
             switch (choice)
             {
                 case "1":
-                    //AddNote(app);
+                    AddNote(app);
                     break;
 
                 case "2":
@@ -107,7 +128,7 @@ public class Program
             Console.WriteLine("1. Register");
             Console.WriteLine("2. Login");
             Console.WriteLine("3. Exit");
-            Console.Write("Choice: ");
+            Console.WriteLine("Choice: ");
 
             var choice = Console.ReadLine();
 
@@ -120,7 +141,7 @@ public class Program
                 case "2":
                     if (Login(app))
                     {
-                        UserMenu(app); // ← przejście do menu użytkownika
+                        UserMenu(app);
                     }
                     break;
 
