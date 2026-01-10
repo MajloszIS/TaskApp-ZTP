@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using TaskApp.Commands;
 using TaskApp.Items;
+using TaskApp.Observer;
+using TaskApp.Access;
 using TaskApp.Repository;
 
 public class ItemQueryService
