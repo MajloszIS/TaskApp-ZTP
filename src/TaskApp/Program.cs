@@ -25,12 +25,6 @@ public class Program
         cosik.Login("alice", "password123");
         cosik.AddNote("Sample Note", "This is the content of the sample note.");
         cosik.AddTask("Sample Task", DateTime.Now.AddDays(7), 1);
-        // Extra notes and tasks for Alice
-        cosik.AddNote("Groceries", "Buy milk, eggs, bread.");
-        cosik.AddNote("Ideas", "Build a note-taking app.");
-        cosik.AddTask("Pay Bills", DateTime.Now.AddDays(1), 3);
-        cosik.AddTask("Workout", DateTime.Now.AddHours(6), 2);
-        cosik.AddTask("Read Book", DateTime.Now.AddDays(5), 1);
         cosik.PinItem("Sample Note");
         var pinnedItems = cosik.GetAllItems();
         Console.WriteLine("After pin:");
@@ -49,17 +43,11 @@ public class Program
 
         cosik.Login("alice", "password123");
         cosik.AddNote("Another Note", "Content for another note.");
-
-        cosik.AddTask("Clean House", DateTime.Now.AddDays(2), 2);
-        cosik.AddNote("Project Plan", "Outline tasks and milestones.");
         cosik.Logout();
 
         cosik.Register("bob", "securepass");
         cosik.Login("bob", "securepass");
         cosik.AddTask("Bob's Task", DateTime.Now.AddDays(3), 2);
-
-        cosik.AddTask("Bob's Errand", DateTime.Now.AddDays(4), 1);
-        cosik.AddNote("Bob's Note", "Call Alice about the report.");
         cosik.ShareItem("Bob's Task", "alice");
         cosik.CloneItem("Bob's Task");
         var bobItems = cosik.GetAllItems();
