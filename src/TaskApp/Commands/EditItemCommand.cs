@@ -1,8 +1,6 @@
 using System;
 using TaskApp.Items;
 using TaskApp.Observer;
-using TaskApp.Access;
-using TaskApp.Repository;
 
 namespace TaskApp.Commands;
 
@@ -14,27 +12,45 @@ public class EditItemCommand : ItemCommandBase
     public EditItemCommand(ItemManager itemManager, IItem item, string title, string content)
         : base(itemManager, item)
     {
-        this.newTitle = title; 
+        this.newTitle = title;
         this.newContent = content;
     }
 
     public override void Execute()
     {
         CreateBackup();
+
         item.Title = newTitle;
-        if(item is Note note)
+        if (item is Note note)
         {
             note.Content = newContent;
         }
-
+        
         itemManager.UpdateItem(item);
     }
+
     public override void Undo()
     {
-        item.Title = backup.title;
-        if(item is Note note)
+        if (backup == null) return;
+
+        var oldState = backup.StateSnapshot;
+
+        item.Title = oldState.Title;
+
+        if (item is Note liveNote && oldState is Note snapshotNote)
         {
-            note.Content = backup.datasnapshot;
+            liveNote.Content = snapshotNote.Content;
+            
+            if (snapshotNote.Tags != null)
+                liveNote.Tags = new List<string>(snapshotNote.Tags);
+            else
+                liveNote.Tags = new List<string>();
+        }
+        else if (item is Tasky liveTask && oldState is Tasky snapshotTask)
+        {
+            liveTask.DueDate = snapshotTask.DueDate;
+            liveTask.Priority = snapshotTask.Priority;
+            liveTask.IsCompleted = snapshotTask.IsCompleted;
         }
 
         itemManager.UpdateItem(item);

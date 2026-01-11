@@ -1,18 +1,14 @@
 using System;
-using TaskApp.Repository;
+using TaskApp.Items;
 
 namespace TaskApp.Commands;
 
 public class ItemMemento
 {
-    public Guid itemid;
-    public string title;
-    public string datasnapshot;
+    public IItem StateSnapshot { get; }
 
-    public ItemMemento(Guid itemid, string title, string datasnapshot)
+    public ItemMemento(IItem stateSnapshot)
     {
-        this.itemid = itemid;
-        this.title = title;
-        this.datasnapshot = datasnapshot;
+        this.StateSnapshot = stateSnapshot;
     }
 }
