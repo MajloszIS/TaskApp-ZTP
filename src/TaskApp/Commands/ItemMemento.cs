@@ -5,7 +5,7 @@ namespace TaskApp.Commands;
 
 public class ItemMemento
 {
-    public IItem StateSnapshot { get; }
+    public readonly IItem StateSnapshot;
 
     public ItemMemento(IItem stateSnapshot)
     {
