@@ -21,13 +21,9 @@ public abstract class ItemCommandBase : ICommand
 
     protected void CreateBackup()
     {
-        string content = "";
-        if (item is Note note)
-        {
-            content = note.Content ?? string.Empty;
-        }
-        backup = new ItemMemento(item.Id, item.Title, content);
-    }
-    public abstract void Execute();
+        var snapshot = item.Clone();
+        
+        backup = new ItemMemento(snapshot);
+    }    public abstract void Execute();
     public abstract void Undo();
 }
