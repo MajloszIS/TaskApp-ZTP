@@ -1,5 +1,6 @@
 ﻿using System;
 using TaskApp.Exceptions;
+using TaskApp.Items;
 using TaskApp.Repository;
 
 
@@ -25,6 +26,107 @@ public class Program
             Pause();
         }
     }
+
+
+
+    static void CreateFolder(TaskAppFacade app)
+{
+    Console.WriteLine("= Create Folder =");
+    Console.Write("Folder title: ");
+    var title = Console.ReadLine();
+
+    try
+    {
+        app.AddFolder(title);
+        Console.WriteLine("Folder created successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+    Pause();
+}
+
+
+static void AddItemToFolder(TaskAppFacade app)
+{
+    try
+    {
+        var items = app.GetAllItems();
+
+        Console.WriteLine("=== Folders ===");
+        foreach (var item in items)
+        {
+            PrintFolderNames(item, 0);
+        }
+
+        Console.Write("\nFolder name: ");
+        var folderName = Console.ReadLine();
+
+        Console.WriteLine("\n=== Files ===");
+        foreach (var item in items)
+        {
+            PrintFileNames(item);
+        }
+
+        Console.Write("\nFile name to move: ");
+        var itemName = Console.ReadLine();
+
+        app.MoveItemToFolder(itemName, folderName);
+        Console.WriteLine("Item moved to folder");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+
+    Pause();
+}
+
+
+
+static void PrintFolderNames(IItem item, int indent)
+{
+    if (item is ItemGroup group)
+    {
+        Console.WriteLine($"{new string(' ', indent * 2)}- {group.Title}");
+        foreach (var child in group.Children)
+        {
+            PrintFolderNames(child, indent + 1);
+        }
+    }
+}
+
+static void PrintFileNames(IItem item)
+{
+    if (item is not ItemGroup)
+    {
+        Console.WriteLine($"- {item.Title}");
+    }
+
+    if (item is ItemGroup group)
+    {
+        foreach (var child in group.Children)
+        {
+            PrintFileNames(child);
+        }
+    }
+}
+
+
+static void PrintFoldersOnly(IItem item, int indent)
+{
+    if (item is ItemGroup group)
+    {
+        Console.WriteLine($"{new string(' ', indent * 2)}- {group.Title}");
+        foreach (var child in group.Children)
+        {
+            PrintFoldersOnly(child, indent + 1);
+        }
+    }
+}
+
+
     static void Register(TaskAppFacade app)
     {
         Console.WriteLine("= Register =\n");
@@ -69,45 +171,56 @@ public class Program
         }
     }
 
-    static void UserMenu(TaskAppFacade app)
+static void UserMenu(TaskAppFacade app)
+{
+    while (true)
     {
-        while (true)
+        Console.Clear();
+        Console.WriteLine("=== User Menu ===");
+        Console.WriteLine("1. Add note");
+        Console.WriteLine("2. Add task");
+        Console.WriteLine("3. Create folder");
+        Console.WriteLine("4. Add item to folder");
+        Console.WriteLine("5. Show my items");
+        Console.WriteLine("6. Logout");
+        Console.WriteLine("Choice: ");
+
+        var choice = Console.ReadLine();
+
+        switch (choice)
         {
-            Console.Clear();
-            Console.WriteLine("=== User Menu ===");
-            Console.WriteLine("1. Add note");
-            Console.WriteLine("2. Add task");
-            Console.WriteLine("3. Show my items");
-            Console.WriteLine("4. Logout");
-            Console.WriteLine("Choice: ");
+            case "1":
+                AddNote(app);
+                break;
 
-            var choice = Console.ReadLine();
+            case "2":
+            // AddTask(app);
+                break;
 
-            switch (choice)
-            {
-                case "1":
-                    AddNote(app);
-                    break;
+            case "3":
+                CreateFolder(app);
+                break;
 
-                case "2":
-                    //AddTask(app);
-                    break;
+            case "4":
+                AddItemToFolder(app);
+                break;
 
-                case "3":
-                    //ShowItems(app);
-                    break;
+            case "5":
+             //   ShowItems(app);
+                break;
 
-                case "4":
-                    app.Logout();
-                    return; // wracamy do menu głównego
+            case "6":
+                app.Logout();
+                return;
 
-                default:
-                    Console.WriteLine("Invalid option");
-                    Pause();
-                    break;
-            }
+            default:
+                Console.WriteLine("Invalid option");
+                Pause();
+                break;
         }
     }
+}
+
 
     static void Pause()
     {
