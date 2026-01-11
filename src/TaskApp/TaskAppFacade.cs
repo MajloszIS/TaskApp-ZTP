@@ -34,7 +34,7 @@ public class TaskAppFacade
     {
         itemManager.SetCurrentUser(null);
         authService.Logout();
-    } 
+    }
     public void AddNote(string title, string content)
     {
         if(string.IsNullOrEmpty(title))
@@ -58,20 +58,114 @@ public class TaskAppFacade
         .Execute();
 }
 
-public void AddItemToFolder(Guid folderId, Guid itemId)
+public ItemGroup GetFolderByTitle(string title)
 {
     var user = authService.GetCurrentUser();
     if (user == null)
         throw new Exception("No user logged in");
 
-    var folder = itemManager.GetItemById(folderId) as ItemGroup;
-    if (folder == null)
-        throw new Exception("Folder not found");
+    foreach (var item in itemManager.GetAllItemsForUser(user))
+    {
+        var folder = FindFolderRecursive(item, title);
+        if (folder != null)
+            return folder;
+    }
 
-    var item = itemManager.GetItemById(itemId);
+    return null;
+}
+
+private ItemGroup FindFolderRecursive(IItem item, string title)
+{
+    if (item is ItemGroup group)
+    {
+        if (group.Title == title)
+            return group;
+
+        foreach (var child in group.Children)
+        {
+            var found = FindFolderRecursive(child, title);
+            if (found != null)
+                return found;
+        }
+    }
+    return null;
+}
+
+public IItem GetItemByTitle(string title)
+{
+    var user = authService.GetCurrentUser();
+    if (user == null)
+        throw new Exception("No user logged in");
+
+    foreach (var item in itemManager.GetAllItemsForUser(user))
+    {
+        var found = FindItemRecursive(item, title);
+        if (found != null)
+            return found;
+    }
+
+    return null;
+}
+
+private IItem FindItemRecursive(IItem item, string title)
+{
+    if (item.Title == title)
+        return item;
+
+    if (item is ItemGroup group)
+    {
+        foreach (var child in group.Children)
+        {
+            var found = FindItemRecursive(child, title);
+            if (found != null)
+                return found;
+        }
+    }
+    return null;
+}
+public void MoveItemToFolder(string itemTitle, string folderTitle)
+{
+    var user = authService.GetCurrentUser();
+    if (user == null)
+        throw new Exception("No user logged in");
+
+    var rootItems = itemManager.GetAllItemsForUser(user);
+
+    var item = GetItemByTitle(itemTitle);
     if (item == null)
         throw new Exception("Item not found");
 
+    var targetFolder = GetItemByTitle(folderTitle) as ItemGroup;
+    if (targetFolder == null)
+        throw new Exception("Folder not found");
+
+    ItemGroup sourceParent = null;
+    foreach (var root in rootItems)
+    {
+        sourceParent = FindParent(root, item);
+        if (sourceParent != null)
+            break;
+    }
+
+    var command = new MoveItemCommand(sourceParent, targetFolder, item);
+    GetHistoryForCurrentUser().Execute(command);
+}
+
+private ItemGroup FindParent(IItem current, IItem target)
+{
+    if (current is ItemGroup group)
+    {
+        if (group.Children.Contains(target))
+            return group;
+
+        foreach (var child in group.Children)
+        {
+            var found = FindParent(child, target);
+            if (found != null)
+                return found;
+        }
+    }
+    return null;
 }
 
     public void AddTask(string title, DateTime dueDate, int priority)
