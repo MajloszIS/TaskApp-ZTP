@@ -1,24 +1,24 @@
 using TaskApp.Items;
 
 namespace TaskApp.Commands;
-
-public class AddItemToGroupCommand : ItemCommandBase
+public class AddItemToGroupCommand : ICommand
 {
-    private readonly ItemGroup parentGroup;
+    private readonly ItemGroup group;
+    private readonly IItem item;
 
-    public AddItemToGroupCommand( IItem item, ItemGroup parentGroup)
-        : base(null, item)
+    public AddItemToGroupCommand(ItemGroup group, IItem item)
     {
-        this.parentGroup = parentGroup;
+        this.group = group;
+        this.item = item;
     }
 
-    public override void Execute()
+    public void Execute()
     {
-        parentGroup.Add(item);
+        group.Add(item);
     }
 
-    public override void Undo()
+    public void Undo()
     {
-        parentGroup.Remove(item);
+        group.Remove(item);
     }
 }
