@@ -26,4 +26,22 @@ public class Note : ItemBase
         }
         return clone;
     }
+
+    public override void Restore(IItem state)
+    {
+        base.Restore(state); 
+        if (state is Note other)
+        {
+            this.Content = other.Content;
+
+            if (other.Tags != null)
+            {
+                this.Tags = new List<string>(other.Tags);
+            }
+            else
+            {
+                this.Tags = new List<string>();
+            }
+        }
+    }
 }

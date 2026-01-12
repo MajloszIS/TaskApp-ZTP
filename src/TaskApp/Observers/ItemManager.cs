@@ -13,6 +13,7 @@ public class ItemManager : IItemObservable
     private readonly List<IItemObserver> observers = new List<IItemObserver>();
     private readonly ItemAccessProxy itemAccess;
     private User? currentUser;
+    private Dictionary<Guid, ItemMemento> backups = new Dictionary<Guid, ItemMemento>();
 
     public ItemManager(IItemRepository itemRepo)
     {
@@ -81,5 +82,19 @@ public class ItemManager : IItemObservable
     public void UnShareItem(User target, IItem item)
     {
         itemAccess.UnShareItem(target, item);
+    }
+
+    public void SetBackup(Guid id, ItemMemento memento)
+    {
+        backups[id] = memento;
+        Console.WriteLine("Backup saved in storage");
+    }
+
+    public ItemMemento? GetBackup(Guid id)
+    {
+        if(backups.ContainsKey(id)){
+            return backups[id];
+        }
+        return null;
     }
 }

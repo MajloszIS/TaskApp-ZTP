@@ -9,4 +9,5 @@ public interface IItem
     DateTime CreatedAt { get; }
     List<User> Owners { get; set; }
     IItem Clone();
+    void Restore(IItem state);
 }

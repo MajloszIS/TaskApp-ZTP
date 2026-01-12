@@ -201,4 +201,22 @@ public void AddItemToFolder(Guid folderId, Guid itemId)
 
         return userHistories[user.Id];
     }
+
+    public void SaveItemState(string title)
+{
+    var item = itemManager.GetItemByTitle(title);
+    if (item == null) throw new Exception("Item not found");
+
+    new SaveStateCommand(itemManager, item).Execute();
+}
+
+public void RestoreItemState(string title)
+{
+    var item = itemManager.GetItemByTitle(title);
+    if (item == null) throw new Exception("Item not found");
+
+
+    var command = new RestoreStateCommand(itemManager, item);
+    GetHistoryForCurrentUser().Execute(command);
+}
 }
