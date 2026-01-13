@@ -34,7 +34,7 @@ public class TaskAppFacade
     {
         itemManager.SetCurrentUser(null);
         authService.Logout();
-    }
+    } 
     public void AddNote(string title, string content)
     {
         if(string.IsNullOrEmpty(title))
@@ -46,128 +46,132 @@ public class TaskAppFacade
         GetHistoryForCurrentUser().Execute(command);
     }
 
-    public void CreateFolder(string title)
+public void CreateFolder(string title)
 {
-    if (string.IsNullOrEmpty(title))
+    if (string.IsNullOrWhiteSpace(title))
         throw new Exception("Folder title cannot be empty");
 
+    var user = authService.GetCurrentUser();
+    if (user == null)
+        throw new Exception("No user logged in");
+
+    var exists = itemManager
+        .GetAllItemsForUser(user)
+        .OfType<ItemGroup>()
+        .Any(f => f.Title == title);
+
+    if (exists)
+        throw new Exception("Folder with this name already exists");
+
     var folder = new ItemGroup(title);
-    folder.Title = title;
-
-    new AddItemCommand(itemManager, folder)
-        .Execute();
-}
-
-public ItemGroup GetFolderByTitle(string title)
-{
-    var user = authService.GetCurrentUser();
-    if (user == null)
-        throw new Exception("No user logged in");
-
-    foreach (var item in itemManager.GetAllItemsForUser(user))
-    {
-        var folder = FindFolderRecursive(item, title);
-        if (folder != null)
-            return folder;
-    }
-
-    return null;
-}
-
-private ItemGroup FindFolderRecursive(IItem item, string title)
-{
-    if (item is ItemGroup group)
-    {
-        if (group.Title == title)
-            return group;
-
-        foreach (var child in group.Children)
-        {
-            var found = FindFolderRecursive(child, title);
-            if (found != null)
-                return found;
-        }
-    }
-    return null;
-}
-
-public IItem GetItemByTitle(string title)
-{
-    var user = authService.GetCurrentUser();
-    if (user == null)
-        throw new Exception("No user logged in");
-
-    foreach (var item in itemManager.GetAllItemsForUser(user))
-    {
-        var found = FindItemRecursive(item, title);
-        if (found != null)
-            return found;
-    }
-
-    return null;
-}
-
-private IItem FindItemRecursive(IItem item, string title)
-{
-    if (item.Title == title)
-        return item;
-
-    if (item is ItemGroup group)
-    {
-        foreach (var child in group.Children)
-        {
-            var found = FindItemRecursive(child, title);
-            if (found != null)
-                return found;
-        }
-    }
-    return null;
-}
-public void MoveItemToFolder(string itemTitle, string folderTitle)
-{
-    var user = authService.GetCurrentUser();
-    if (user == null)
-        throw new Exception("No user logged in");
-
-    var rootItems = itemManager.GetAllItemsForUser(user);
-
-    var item = GetItemByTitle(itemTitle);
-    if (item == null)
-        throw new Exception("Item not found");
-
-    var targetFolder = GetItemByTitle(folderTitle) as ItemGroup;
-    if (targetFolder == null)
-        throw new Exception("Folder not found");
-
-    ItemGroup sourceParent = null;
-    foreach (var root in rootItems)
-    {
-        sourceParent = FindParent(root, item);
-        if (sourceParent != null)
-            break;
-    }
-
-    var command = new MoveItemCommand(sourceParent, targetFolder, item);
+    var command = new AddItemCommand(itemManager, folder);
     GetHistoryForCurrentUser().Execute(command);
 }
 
-private ItemGroup FindParent(IItem current, IItem target)
+public void AddFolderToFolder(string parentFolderName, string childFolderName)
 {
-    if (current is ItemGroup group)
-    {
-        if (group.Children.Contains(target))
-            return group;
+    var user = authService.GetCurrentUser();
+    if (user == null)
+        throw new Exception("No user logged in");
 
-        foreach (var child in group.Children)
-        {
-            var found = FindParent(child, target);
-            if (found != null)
-                return found;
-        }
-    }
-    return null;
+    // Pobieramy wszystkie foldery użytkownika
+    var allFolders = itemManager
+        .GetAllItemsForUser(user)
+        .OfType<ItemGroup>()
+        .ToList();
+
+    // Szukamy folderu nadrzędnego
+    var parentFolder = allFolders.FirstOrDefault(f => f.Title == parentFolderName);
+    if (parentFolder == null)
+        throw new Exception("Parent folder not found");
+
+    // Sprawdzamy, czy folder o tej samej nazwie już istnieje w parentFolder
+    if (parentFolder.Children.OfType<ItemGroup>().Any(f => f.Title == childFolderName))
+        throw new Exception("Folder already exists in this folder");
+
+    // Nie pozwalamy na włożenie folderu do samego siebie
+    if (parentFolderName == childFolderName)
+        throw new Exception("Folder cannot contain itself");
+
+    // Tworzymy nowy folder i dodajemy do parentFolder
+    var childFolder = new ItemGroup(childFolderName);
+    parentFolder.Add(childFolder);
+
+    // Aktualizujemy parentFolder w repozytorium
+    itemManager.UpdateItem(parentFolder);
 }
 
+public List<ItemGroup> GetRootFolders()
+{
+    var user = authService.GetCurrentUser();
+    if (user == null)
+        throw new Exception("No user logged in");
+
+    var allFolders = itemManager
+        .GetAllItemsForUser(user)
+        .OfType<ItemGroup>()
+        .ToList();
+
+    var childFolders = new HashSet<Guid>();
+    foreach (var folder in allFolders)
+    {
+        foreach (var child in folder.Children.OfType<ItemGroup>())
+        {
+            childFolders.Add(child.Id);
+        }
+    }
+
+    return allFolders.Where(f => !childFolders.Contains(f.Id)).ToList();
+}
+
+public void AddItemToFolder(Guid folderId, Guid itemId)
+{
+    var user = authService.GetCurrentUser();
+    if (user == null)
+        throw new Exception("No user logged in");
+
+    var folder = itemManager.GetItemById(folderId) as ItemGroup;
+    if (folder == null)
+        throw new Exception("Folder not found");
+
+    var item = itemManager.GetItemById(itemId);
+    if (item == null)
+        throw new Exception("Item not found");
+
+    folder.Add(item);
+    itemManager.UpdateItem(folder);
+}
+public void RemoveItemFromFolder(Guid folderId, Guid itemId)
+{
+    var folder = itemManager.GetItemById(folderId) as ItemGroup;
+    if (folder == null)
+        throw new Exception("Folder not found");
+
+    var item = folder.Children.FirstOrDefault(i => i.Id == itemId);
+    if (item == null)
+        throw new Exception("Item not in folder");
+
+    folder.Remove(item);
+    itemManager.UpdateItem(folder);
+}
+public void ShareFolder(Guid folderId, string targetUsername)
+{
+    var folder = itemManager.GetItemById(folderId) as ItemGroup;
+    if (folder == null)
+        throw new Exception("Folder not found");
+
+    var target = authService.GetUserByUsername(targetUsername);
+    itemManager.ShareItem(target, folder);
+}
+public ItemGroup ViewFolder(Guid folderId)
+{
+    var folder = itemManager.GetItemById(folderId) as ItemGroup;
+    if (folder == null)
+        throw new Exception("Folder not found");
+
+    return folder;
+}
+public void DeleteFolder(string folderName) {var user = authService.GetCurrentUser(); if (user == null) throw new Exception("No user logged in"); var folders = itemManager .GetAllItemsForUser(user) .OfType<ItemGroup>() .ToList(); ItemGroup? parent = null; ItemGroup? target = null; foreach (var f in folders) { if (f.Title == folderName) { target = f; break; } var child = f.Children .OfType<ItemGroup>() .FirstOrDefault(c => c.Title == folderName); if (child != null) { parent = f; target = child; break; } } if (target == null) throw new Exception("Folder not found"); var command = new DeleteFolderCommand(itemManager, target, parent); GetHistoryForCurrentUser().Execute(command); }
     public void AddTask(string title, DateTime dueDate, int priority)
     {
         if(string.IsNullOrEmpty(title))
@@ -188,6 +192,7 @@ private ItemGroup FindParent(IItem current, IItem target)
         var command = new AddItemCommand(itemManager, task);
         GetHistoryForCurrentUser().Execute(command);
     }
+    
     public void EditItem(Guid id, string newTitle, string newContent)
     {
         var user = authService.GetCurrentUser();
