@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TaskApp.Exceptions;
 
 namespace TaskApp.Repository;
 
@@ -26,7 +27,7 @@ public class UserRepository : IUserRepository
             }
         }
 
-        throw new Exception("User not found");
+        throw new ValidationException("User not found");
     }
     public User GetUserByUsername(string username)
     {
@@ -43,7 +44,7 @@ public class UserRepository : IUserRepository
             }
         }
 
-        throw new Exception("User not found");
+        throw new ValidationException("User not found");
     }
     public void AddUser(User user)
     {
@@ -51,7 +52,10 @@ public class UserRepository : IUserRepository
         {
             throw new ArgumentNullException(nameof(user), "User cannot be null");
         }
-
+        if (_users.Any(u => u.Username == user.Username))
+        {
+            throw new UserAlreadyExistsException(user.Username);
+        }
         if (_users.Any(u => u.Id == user.Id))
         {
             throw new Exception("User with the same ID already exists");

@@ -11,8 +11,8 @@ public class CloneItemCommand : ItemCommandBase
     private ItemGroup targetGroup;
     private IItem? clonedItem;
 
-    public CloneItemCommand(ItemManager itemManager, User user, IItem item, ItemGroup? targetGroup)
-        : base(itemManager, user, item)
+    public CloneItemCommand(ItemManager itemManager, IItem item, ItemGroup? targetGroup)
+        : base(itemManager, item)
     {
         this.targetGroup = targetGroup;
     }
@@ -22,7 +22,6 @@ public class CloneItemCommand : ItemCommandBase
         clonedItem = item.Clone();
         if (clonedItem == null) return;
         clonedItem.Title = $"{item.Title} (Copy)";
-        clonedItem.Owners.Add(user);
         if (targetGroup != null)
             targetGroup.Add(clonedItem);
         else

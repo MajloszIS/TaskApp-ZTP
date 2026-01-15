@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TaskApp.Exceptions;
 using TaskApp.Items;
 
 
@@ -21,7 +22,7 @@ public class ItemRepository : IItemRepository
                 return item;
             }
         }
-        throw new Exception("Item not found");
+        throw new ItemNotFoundException();
     }
     public IItem GetItemByTitle(string title)
     {
@@ -32,7 +33,7 @@ public class ItemRepository : IItemRepository
                 return item;
             }
         }
-        throw new Exception("Item not found");
+        throw new ItemNotFoundException();
     }
     public List<IItem> GetAllItemsForUser(User user)
     {
@@ -50,7 +51,7 @@ public class ItemRepository : IItemRepository
     {
         if (_items.Contains(item))
         {
-            throw new Exception("Item already exists");
+            throw new ValidationException("Item with this ID already exists.");
         }
         _items.Add(item);
     }
@@ -58,7 +59,7 @@ public class ItemRepository : IItemRepository
     {
         if (!_items.Contains(item))
         {
-            throw new Exception("Item does not exist");
+            throw new ItemNotFoundException();
         }
         _items.Remove(item);
         _items.Add(item); 
@@ -71,9 +72,5 @@ public class ItemRepository : IItemRepository
         }
         _items.Remove(item);
     }
-    public void ShareItem(Guid ownerId, Guid targetId, Guid itemId)
-    {
-        // Implementation for sharing an item can be added here if needed
-        
-    }
+    
 }

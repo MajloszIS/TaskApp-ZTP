@@ -11,14 +11,12 @@ public abstract class ItemCommandBase : ICommand
 {
     protected IItem item;
     protected ItemManager itemManager;
-    protected User user;
     protected ItemMemento? backup;
 
-    public ItemCommandBase(ItemManager itemManager, User user, IItem item)
+    public ItemCommandBase(ItemManager itemManager, IItem item)
     {
         this.item = item;
         this.itemManager = itemManager;
-        this.user = user;
     }
 
     protected void CreateBackup()

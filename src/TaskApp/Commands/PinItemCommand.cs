@@ -12,26 +12,20 @@ public class PinItemCommand : ItemCommandBase
     private IItem? innerItem;
     private bool executed = false;
 
-    public PinItemCommand(ItemManager itemManager, User user, IItem item, bool unpin = false)
-        : base(itemManager, user, item)
+    public PinItemCommand(ItemManager itemManager, IItem item, bool unpin = false)
+        : base(itemManager, item)
     {
         this.unpinMode = unpin;
     }
 
     public override void Execute()
     {
-        if (user == null)
-        {
-            throw new Exception("No user is logged in");
-        }
+    
         if (item == null)
         {
             throw new Exception("Item not found");
         }
-        if (!item.Owners.Contains(user))
-        {
-            throw new Exception("Access denied to item");
-        }
+        
         if (!unpinMode)
         {
             if (item is PinnedItemDecorator)

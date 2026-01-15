@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TaskApp.Access;
 using TaskApp.Commands;
+using TaskApp.Exceptions;
 using TaskApp.Items;
 using TaskApp.Observer;
 using TaskApp.Repository;
@@ -24,11 +25,10 @@ public class TaskAppFacade
     {   
         authService.Register(username, password);
     }
-    public bool Login(string username, string password) 
+    public void Login(string username, string password) 
     { 
-        bool result = authService.Login(username, password);
+        authService.Login(username, password);
         itemManager.SetCurrentUser(authService.GetCurrentUser());
-        return result;
     }
     public void Logout()
     {
@@ -39,10 +39,10 @@ public class TaskAppFacade
     {
         if(string.IsNullOrEmpty(title))
         {
-            throw new Exception("Title cannot be empty");
+            throw new ValidationException("Title cannot be empty.");
         }
         var note = new Note(title, content);
-        var command = new AddItemCommand(itemManager, authService.GetCurrentUser(), note);
+        var command = new AddItemCommand(itemManager, note);
         GetHistoryForCurrentUser().Execute(command);
     }
 
@@ -51,10 +51,10 @@ public class TaskAppFacade
     if (string.IsNullOrEmpty(title))
         throw new Exception("Folder title cannot be empty");
 
-    var folder = new ItemGroup(new List<IItem>());
+    var folder = new ItemGroup(title);
     folder.Title = title;
 
-    new AddItemCommand(itemManager, authService.GetCurrentUser(), folder)
+    new AddItemCommand(itemManager, folder)
         .Execute();
 }
 
@@ -85,7 +85,17 @@ public void AddItemToFolder(string folderTitle, string itemTitle)
             throw new Exception("Title cannot be empty");
         }
         var task = new Tasky(title, dueDate, priority);
-        var command = new AddItemCommand(itemManager, authService.GetCurrentUser(), task);
+        var command = new AddItemCommand(itemManager, task);
+        GetHistoryForCurrentUser().Execute(command);
+    }
+    public void AddFolder(string title)
+    {
+        if (string.IsNullOrEmpty(title))
+        {
+            throw new Exception("Title cannot be empty");
+        }
+        var task = new ItemGroup(title);
+        var command = new AddItemCommand(itemManager, task);
         GetHistoryForCurrentUser().Execute(command);
     }
     public void EditItem(Guid id, string newTitle, string newContent)
@@ -103,9 +113,9 @@ public void AddItemToFolder(string folderTitle, string itemTitle)
         }
         if (foundItem == null){
             throw new Exception("Item not found");
-            }
+        }
 
-        var command = new EditItemCommand(itemManager, user, foundItem, newTitle, newContent);
+        var command = new EditItemCommand(itemManager, foundItem, newTitle, newContent);
         GetHistoryForCurrentUser().Execute(command);
     }
     public void CloneItem(string title)
@@ -120,30 +130,32 @@ public void AddItemToFolder(string folderTitle, string itemTitle)
         {
             throw new Exception("Item not found");
         }
-        var command = new CloneItemCommand(itemManager, user, originalItem, null);
+        var command = new CloneItemCommand(itemManager, originalItem, null);
         GetHistoryForCurrentUser().Execute(command);
     }
 
     public void PinItem(string title)
     {
         var item = itemManager.GetItemByTitle(title);
-        new PinItemCommand(itemManager, authService.GetCurrentUser(), item, false).Execute();
+        var command = new PinItemCommand(itemManager, item, false);
+        GetHistoryForCurrentUser().Execute(command);
     }
 
     public void UnpinItem(string title)
     {
         var item = itemManager.GetItemByTitle(title);
-        new PinItemCommand(itemManager, authService.GetCurrentUser(), item, true).Execute();
+        var command = new PinItemCommand(itemManager, item, true);
+        GetHistoryForCurrentUser().Execute(command);
     }
     public void DeleteItem(string title)
     {
-        new DeleteItemCommand(itemManager, authService.GetCurrentUser(), itemManager.GetItemByTitle(title)).Execute();
+        var command = new DeleteItemCommand(itemManager, itemManager.GetItemByTitle(title));
+        GetHistoryForCurrentUser().Execute(command);
     }
     public void ShareItem(string title, string targetUsername)
     {
         var target = authService.GetUserByUsername(targetUsername);
-        var owner = authService.GetCurrentUser();
-        var command = new ShareItemCommand(itemManager, owner, itemManager.GetItemByTitle(title), target);
+        var command = new ShareItemCommand(itemManager, itemManager.GetItemByTitle(title), target);
         GetHistoryForCurrentUser().Execute(command);
     }
     public List<IItem> GetAllItems()
@@ -151,7 +163,7 @@ public void AddItemToFolder(string folderTitle, string itemTitle)
         var user = authService.GetCurrentUser();
         if(user == null)
         {
-            throw new Exception("No user is logged in");
+            throw new AccessDeniedException();
         }
         return itemManager.GetAllItemsForUser(user);
     }

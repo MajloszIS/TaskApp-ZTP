@@ -1,5 +1,6 @@
 ﻿using System;
 using TaskApp.Repository;
+using TaskApp.Exceptions;
 
 public class AuthService
 {
@@ -11,41 +12,36 @@ public class AuthService
     }
     public void Register(string username, string password)
     {
-        if(string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
-            throw new Exception("Username and password cannot be empty");
+            throw new ValidationException("Username and password cannot be empty.");
         }
 
         var newUser = new User(username, password);
         userRepository.AddUser(newUser);
     }
-    public bool Login(string username, string password)
+    public void Login(string username, string password)
     {
-        if(string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-        {
-            throw new Exception("Username and password cannot be empty");
-        }
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+            throw new ValidationException("Username and password cannot be empty.");
         var user = userRepository.GetUserByUsername(username);
-        if(user.PasswordHash == password)
-        {
-            currentUser = user;
-            return true;
-        }
-        return false;
+        if (!user.VerifyPassword(password))
+            throw new InvalidCredentialsException();
+        currentUser = user;
     }
     public void Logout()
     {
-        if(currentUser == null)
+        if (currentUser == null)
         {
-            throw new Exception("No user is currently logged in");
+            throw new ValidationException("No user is currently logged in.");
         }
         currentUser = null;
     }
     public User GetCurrentUser()
     {
-        if(currentUser == null)
+        if (currentUser == null)
         {
-            throw new Exception("No user is currently logged in");
+            throw new ValidationException("No user is currently logged in.");
         }
         return currentUser;
     }
