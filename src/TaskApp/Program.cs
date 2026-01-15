@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic; // Potrzebne do List<>
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TaskApp.Exceptions;
@@ -207,7 +207,6 @@ static void AddItemToFolder(TaskAppFacade app)
         return;
     }
 
-    // dostępne pliki: wszystkie poza folderami i te które jeszcze nie są w folderze
     var availableFiles = allItems
         .Where(i => i is not ItemGroup && !folder.Children.Contains(i))
         .ToList();
@@ -238,7 +237,6 @@ static void AddItemToFolder(TaskAppFacade app)
     Pause();
 }
 
-// Wyświetlanie folderów w stylu przeglądarki (już było)
 static void DisplayFolders(List<ItemGroup> folders, int indent = 0)
 {
     string indentStr = new string(' ', indent * 2);
@@ -253,7 +251,6 @@ static void DisplayFolders(List<ItemGroup> folders, int indent = 0)
     }
 }
 
-// Wyświetlanie plików i folderów w stylu przeglądarki, dla listy plików (nie folderów)
 static void DisplayFolderContents(List<IItem> items, int indent = 0)
 {
     string indentStr = new string(' ', indent * 2);
@@ -380,7 +377,7 @@ static void AddFolderToFolderConsole(TaskAppFacade app)
 
     try
     {
-        app.AddFolderToFolder(parent, child); // ✅ poprawna nazwa
+        app.AddFolderToFolder(parent, child);
         Console.WriteLine("Folder added successfully.");
     }
     catch (Exception ex)
@@ -647,7 +644,7 @@ static void UserMenu(TaskAppFacade app)
                 break;
 
 case "7":
-    while (true) // petla folder management
+    while (true) 
     {
         Console.Clear();
         Console.WriteLine("=== Folder Management ===");
@@ -671,7 +668,7 @@ case "7":
             case "5": ViewFolder(app); break;
             case "6": DeleteFolder(app); break;
             case "7": AddFolderToFolderConsole(app); break;
-            case "0": goto ExitFolderManagement; // wyjście z pętli
+            case "0": goto ExitFolderManagement; 
             default:
                 Console.WriteLine("Invalid option");
                 Pause();
