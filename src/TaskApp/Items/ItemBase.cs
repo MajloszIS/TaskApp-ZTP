@@ -24,4 +24,8 @@ public abstract class ItemBase : IItem
     }
 
     public abstract IItem Clone();
+    public virtual void Restore(IItem state)
+    {
+        this.Title = state.Title;
+    }
 }

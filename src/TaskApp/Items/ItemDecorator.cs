@@ -30,4 +30,8 @@ public abstract class ItemDecorator : IItem
     {
         return innerItem;
     }
+    public void Restore(IItem state)
+    {
+        innerItem.Restore(state);
+    }
 }

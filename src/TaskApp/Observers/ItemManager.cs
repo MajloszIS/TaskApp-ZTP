@@ -82,4 +82,17 @@ public class ItemManager : IItemObservable
     {
         itemAccess.UnShareItem(target, item);
     }
+    public void SetBackup(Guid id, ItemMemento memento)
+    {
+        backups[id] = memento;
+        Console.WriteLine("Backup saved in storage");
+    }
+
+    public ItemMemento? GetBackup(Guid id)
+    {
+        if(backups.ContainsKey(id)){
+            return backups[id];
+        }
+        return null;
+    }
 }
