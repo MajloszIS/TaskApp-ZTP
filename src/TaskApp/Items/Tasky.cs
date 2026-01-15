@@ -22,4 +22,14 @@ public class Tasky : ItemBase
             IsCompleted = this.IsCompleted
         };
     }
+    public override void Restore(IItem state)
+    {
+        base.Restore(state); 
+        if (state is Tasky other)
+        {
+            this.Priority = other.Priority;
+            this.DueDate = other.DueDate;
+            this.IsCompleted = other.IsCompleted;
+        }
+    }
 }
