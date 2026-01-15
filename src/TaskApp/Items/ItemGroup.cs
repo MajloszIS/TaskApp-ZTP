@@ -8,7 +8,7 @@ public class ItemGroup : ItemBase
     public List<IItem> Children { get; }
 
     public ItemGroup(string title) :
-        base(title: "Group")
+        base(title)
     {
         Children = new List<IItem>();
     }

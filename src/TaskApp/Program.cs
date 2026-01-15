@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic; // Potrzebne do List<>
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TaskApp.Exceptions;
@@ -122,6 +122,302 @@ public class Program
         }
         Pause();
     }
+static void ViewFolder(TaskAppFacade app)
+{
+    var rootFolders = app.GetRootFolders();
+
+    if (rootFolders.Count == 0)
+    {
+        Console.WriteLine("No folders available.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine("Available folders:");
+    foreach (var f in rootFolders)
+        Console.WriteLine($" - {f.Title}");
+
+    Console.Write("\nEnter folder name: ");
+    var name = Console.ReadLine();
+
+    var folder = rootFolders.FirstOrDefault(f => f.Title == name);
+    if (folder == null)
+    {
+        Console.WriteLine("Folder not found.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine($"\n📁 {folder.Title}");
+    if (folder.Children.Count == 0)
+    {
+        Console.WriteLine("(Empty)");
+    }
+    else
+    {
+        foreach (var item in folder.Children)
+        {
+            Console.WriteLine($" - {item.Title}");
+        }
+    }
+
+    Pause();
+}
+
+
+static void CreateFolder(TaskAppFacade app)
+{
+    Console.Write("Folder title: ");
+    var title = Console.ReadLine();
+
+    try
+    {
+        app.CreateFolder(title);
+        Console.WriteLine("Folder created.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+    Pause();
+}
+static void AddItemToFolder(TaskAppFacade app)
+{
+    var allItems = app.GetAllItems();
+    var folders = allItems.OfType<ItemGroup>().ToList();
+
+    if (folders.Count == 0)
+    {
+        Console.WriteLine("No folders available.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine("Available folders:");
+    DisplayFolders(folders);
+
+    Console.Write("\nEnter the folder to add a file to: ");
+    var folderName = Console.ReadLine();
+
+    var folder = folders.FirstOrDefault(f => f.Title == folderName);
+    if (folder == null)
+    {
+        Console.WriteLine("Folder not found.");
+        Pause();
+        return;
+    }
+
+    var availableFiles = allItems
+        .Where(i => i is not ItemGroup && !folder.Children.Contains(i))
+        .ToList();
+
+    if (availableFiles.Count == 0)
+    {
+        Console.WriteLine($"No files available to add to folder '{folder.Title}'.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine($"\nFiles available to add to '{folder.Title}':");
+    DisplayFolderContents(availableFiles);
+
+    Console.Write("\nEnter file name to add: ");
+    var fileName = Console.ReadLine();
+
+    var file = availableFiles.FirstOrDefault(f => f.Title == fileName);
+    if (file == null)
+    {
+        Console.WriteLine("File not found or already in folder.");
+        Pause();
+        return;
+    }
+
+    app.AddItemToFolder(folder.Id, file.Id);
+    Console.WriteLine($"File '{file.Title}' added to folder '{folder.Title}'.");
+    Pause();
+}
+
+static void DisplayFolders(List<ItemGroup> folders, int indent = 0)
+{
+    string indentStr = new string(' ', indent * 2);
+    foreach (var folder in folders)
+    {
+        Console.WriteLine($"{indentStr}📁 {folder.Title} ({folder.Children.Count} items)");
+        var subFolders = folder.Children.OfType<ItemGroup>().ToList();
+        if (subFolders.Count > 0)
+        {
+            DisplayFolders(subFolders, indent + 1);
+        }
+    }
+}
+
+static void DisplayFolderContents(List<IItem> items, int indent = 0)
+{
+    string indentStr = new string(' ', indent * 2);
+    foreach (var item in items)
+    {
+        if (item is ItemGroup folder)
+        {
+            Console.WriteLine($"{indentStr}📁 {folder.Title} ({folder.Children.Count} items)");
+        }
+        else
+        {
+            Console.WriteLine($"{indentStr}📄 {item.Title}");
+        }
+    }
+}
+
+
+
+static void RemoveItemFromFolder(TaskAppFacade app)
+{
+    var folders = app.GetAllItems()
+        .OfType<ItemGroup>()
+        .ToList();
+
+    if (folders.Count == 0)
+    {
+        Console.WriteLine("No folders available.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine("Folders:");
+    foreach (var f in folders)
+        Console.WriteLine($" - {f.Title}");
+
+    Console.Write("\nFolder name: ");
+    var folderName = Console.ReadLine();
+
+    var folder = folders.FirstOrDefault(f => f.Title == folderName);
+    if (folder == null)
+    {
+        Console.WriteLine("Folder not found.");
+        Pause();
+        return;
+    }
+
+    if (folder.Children.Count == 0)
+    {
+        Console.WriteLine("Folder is empty.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine("\nFiles in folder:");
+    foreach (var i in folder.Children)
+        Console.WriteLine($" - {i.Title}");
+
+    Console.Write("\nFile name to remove: ");
+    var fileName = Console.ReadLine();
+
+    var file = folder.Children.FirstOrDefault(i => i.Title == fileName);
+    if (file == null)
+    {
+        Console.WriteLine("File not found in folder.");
+        Pause();
+        return;
+    }
+
+    app.RemoveItemFromFolder(folder.Id, file.Id);
+
+    Console.WriteLine("File removed from folder.");
+    Pause();
+}
+
+static void ShareFolder(TaskAppFacade app)
+{
+    var folders = app.GetAllItems()
+        .OfType<ItemGroup>()
+        .ToList();
+
+    Console.WriteLine("Folders:");
+    foreach (var f in folders)
+        Console.WriteLine($" - {f.Title}");
+
+    Console.Write("\nFolder name: ");
+    var name = Console.ReadLine();
+
+    Console.Write("Target username: ");
+    var username = Console.ReadLine();
+
+    var folder = folders.FirstOrDefault(f => f.Title == name);
+    if (folder == null)
+    {
+        Console.WriteLine("Folder not found.");
+        Pause();
+        return;
+    }
+
+    app.ShareFolder(folder.Id, username);
+    Console.WriteLine("Folder shared.");
+    Pause();
+}
+
+static void AddFolderToFolderConsole(TaskAppFacade app)
+{
+    var rootFolders = app.GetRootFolders();
+
+    if (rootFolders.Count == 0)
+    {
+        Console.WriteLine("No folders available.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine("Available parent folders:");
+    foreach (var f in rootFolders)
+        Console.WriteLine($" - {f.Title}");
+
+    Console.Write("\nParent folder name: ");
+    var parent = Console.ReadLine();
+
+    Console.Write("New folder name: ");
+    var child = Console.ReadLine();
+
+    try
+    {
+        app.AddFolderToFolder(parent, child);
+        Console.WriteLine("Folder added successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error: " + ex.Message);
+    }
+    Pause();
+}
+
+
+
+static void DeleteFolder(TaskAppFacade app)
+{
+    var rootFolders = app.GetRootFolders();
+
+    if (rootFolders.Count == 0)
+    {
+        Console.WriteLine("No folders available.");
+        Pause();
+        return;
+    }
+
+    Console.WriteLine("Available folders to delete:");
+    foreach (var f in rootFolders)
+        Console.WriteLine($" - {f.Title}");
+
+    Console.Write("\nFolder name to delete: ");
+    var name = Console.ReadLine();
+
+    try
+    {
+        app.DeleteFolder(name);
+        Console.WriteLine("Folder deleted successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error: " + ex.Message);
+    }
+    Pause();
+}
 
     static void EditItem(TaskAppFacade app)
     {
@@ -296,69 +592,103 @@ public class Program
         }
     }
 
-    static void UserMenu(TaskAppFacade app)
+static void UserMenu(TaskAppFacade app)
+{
+    while (true)
     {
-        while (true)
+        Console.Clear();
+        Console.WriteLine("=== User Menu ===");
+        Console.WriteLine("1. Add Note/Task");
+        Console.WriteLine("2. Show my items");
+        Console.WriteLine("3. Edit item");
+        Console.WriteLine("4. Share item");
+        Console.WriteLine("5. Pin item");
+        Console.WriteLine("6. Clone item");
+        Console.WriteLine("7. Folder management");
+        Console.WriteLine("0. Logout");
+        Console.Write("Choice: ");
+
+        var choice = Console.ReadLine();
+
+        switch (choice)
         {
-            Console.Clear();
-            Console.WriteLine("=== User Menu ===");
-            Console.WriteLine("1. Add Note/Task");
-            Console.WriteLine("2. Show my items");
-            Console.WriteLine("3. Edit item");
-            Console.WriteLine("4. Share item");
-            Console.WriteLine("5. Pin item");
-            Console.WriteLine("6. Clone item");
-            Console.WriteLine("0. Logout");
-            Console.WriteLine("Choice: ");
+            case "1":
+                Console.Clear();
+                Console.WriteLine("1. Add Note");
+                Console.WriteLine("2. Add Task");
+                switch (Console.ReadLine())
+                {
+                    case "1": AddNote(app); break;
+                    case "2": AddTask(app); break;
+                }
+                break;
 
-            var choice = Console.ReadLine();
+            case "2":
+                ShowItems(app);
+                break;
 
-            switch (choice)
-            {
-                case "1":
-                    Console.Clear();
-                    Console.WriteLine("1. Add Note");
-                    Console.WriteLine("2. Add Task");
-                    var choice1 = Console.ReadLine();
-                    switch (choice1)
-                    {
-                        case "1":
-                            AddNote(app);
-                            break;
-                        case "2":
-                            AddTask(app);
-                            break;
-                        default:
-                            Console.WriteLine("Invalid option");
-                            Pause();
-                            break;
-                    }
-                    break;
-                case "2":
-                    ShowItems(app);
-                    break;
-                case "3":
-                    EditItem(app);
-                    break;
-                case "4":
-                    ShareItem(app);
-                    break;
-                case "5":
-                    PinItem(app);
-                    break;
-                case "6":
-                    CloneItem(app);
-                    break;
-                case "0":
-                    app.Logout();
-                    return;
-                default:
-                    Console.WriteLine("Invalid option");
-                    Pause();
-                    break;
-            }
+            case "3":
+                EditItem(app);
+                break;
+
+            case "4":
+                ShareItem(app);
+                break;
+
+            case "5":
+                PinItem(app);
+                break;
+
+            case "6":
+                CloneItem(app);
+                break;
+
+case "7":
+    while (true) 
+    {
+        Console.Clear();
+        Console.WriteLine("=== Folder Management ===");
+        Console.WriteLine("1. Create folder");
+        Console.WriteLine("2. Add item to folder");
+        Console.WriteLine("3. Remove item from folder");
+        Console.WriteLine("4. Share folder");
+        Console.WriteLine("5. View folder");
+        Console.WriteLine("6. Delete folder");
+        Console.WriteLine("7. Add folder to folder");
+        Console.WriteLine("0. Back");
+
+        var folderChoice = Console.ReadLine();
+
+        switch (folderChoice)
+        {
+            case "1": CreateFolder(app); break;
+            case "2": AddItemToFolder(app); break;
+            case "3": RemoveItemFromFolder(app); break;
+            case "4": ShareFolder(app); break;
+            case "5": ViewFolder(app); break;
+            case "6": DeleteFolder(app); break;
+            case "7": AddFolderToFolderConsole(app); break;
+            case "0": goto ExitFolderManagement; 
+            default:
+                Console.WriteLine("Invalid option");
+                Pause();
+                break;
         }
     }
+ExitFolderManagement:
+    break;
+            case "0":
+                app.Logout();
+                return;
+
+            default:
+                Console.WriteLine("Invalid option");
+                Pause();
+                break;
+        }
+    }
+}
+
 
     static void Pause()
     {
