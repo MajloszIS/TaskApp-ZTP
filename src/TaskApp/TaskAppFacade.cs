@@ -301,13 +301,36 @@ public void DeleteFolder(string folderName)
     }
     public List<IItem> FilterItems(string criteria)
     {
-        var list = new List<IItem>();
-        return list;
+        var user = authService.GetCurrentUser();
+        return queryService.Filter(user, criteria);
     }
     public List<IItem> SearchItems(string text)
     {
-        var list = new List<IItem>();
-        return list;
+        var user = authService.GetCurrentUser();
+        return queryService.Search(user, text);
+    }
+    public List<IItem> SortItems(List<IItem> items, string mode)
+    {
+        return queryService.Sort(items, mode);
+    }
+    public void PrintAllItems()
+    {
+        var user = authService.GetCurrentUser();
+        queryService.PrintAllItems(user);
+    }
+    public void PrintFilteredItems(string criteria)
+    {
+        var user = authService.GetCurrentUser();
+        queryService.PrintFilteredItems(user, criteria);
+    }
+    public void PrintSortedItems(List<IItem> items, string mode)
+    {
+        queryService.PrintSortedItems(items, mode);
+    }
+    public void PrintSearchedItems(string text)
+    {
+        var user = authService.GetCurrentUser();
+        queryService.PrintSearchedItems(user, text);
     }
     public void Undo()
     {
