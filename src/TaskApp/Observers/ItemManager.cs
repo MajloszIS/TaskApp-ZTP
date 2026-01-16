@@ -13,6 +13,7 @@ public class ItemManager : IItemObservable
     private readonly List<IItemObserver> observers = new List<IItemObserver>();
     private readonly ItemAccessProxy itemAccess;
     private User? currentUser;
+    private Dictionary<Guid, ItemMemento> backups = new Dictionary<Guid, ItemMemento>();
 
     public ItemManager(IItemRepository itemRepo)
     {
