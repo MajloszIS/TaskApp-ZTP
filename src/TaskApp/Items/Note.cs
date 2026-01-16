@@ -20,7 +20,12 @@ public class Note : ItemBase
     public override IItem Clone()
     {
         var cloneNote = new Note(this.Title, this.Content ?? "");
-        cloneNote.Owners = this.Owners;
+        var clonedOwners = new List<User>();
+        foreach(User user in this.Owners)
+        {
+            clonedOwners.Add(user);
+        }
+        cloneNote.Owners = clonedOwners;
         if (this.Tags != null)
         {
             cloneNote.Tags = new List<string>(this.Tags);
