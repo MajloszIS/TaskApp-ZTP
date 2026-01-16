@@ -18,7 +18,12 @@ public class Tasky : ItemBase
     public override IItem Clone()
     {
         var cloneTasky = new Tasky(this.Title, this.DueDate, this.Priority);
-        cloneTasky.Owners = this.Owners;
+        var clonedOwners = new List<User>();
+        foreach(User user in this.Owners)
+        {
+            clonedOwners.Add(user);
+        }
+        cloneTasky.Owners = clonedOwners;
         return cloneTasky;
     }
     public override void Restore(IItem state)
