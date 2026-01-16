@@ -22,7 +22,7 @@ public class ItemAccessProxy : IItemAccess
         {
             throw new AccessDeniedException();
         }
-        if (!item.Owners.Contains(currentUser))
+        if (!item.Owners.Any(o => o.Id == currentUser.Id))
         {
             cachedItems.Clear();
             throw new AccessDeniedException();
@@ -75,14 +75,19 @@ public class ItemAccessProxy : IItemAccess
 
         if (user.Id != currentUser.Id)
             throw new AccessDeniedException();
-            
+
         var items = innerService.GetAllItemsForUser(user);
         foreach (var item in items)
         {
-            if (!item.Owners.Contains(user))
+            if (!item.Owners.Any(o => o.Id == user.Id))
             {
                 cachedItems.Clear();
                 throw new AccessDeniedException();
+            }
+
+            if (!cachedItems.Any(c => c.Id == item.Id))
+            {
+                cachedItems.Add(item);
             }
         }
         return items;
@@ -120,28 +125,28 @@ public class ItemAccessProxy : IItemAccess
     public void ShareItem(User targetUser, IItem item)
     {
         EnsureLoggedInAndOwner(item);
-        if (targetUser == currentUser)
+        if (targetUser.Id == currentUser!.Id)
         {
             throw new ValidationException("Owner cannot share the item with themselves.");
         }
-        if (item.Owners.Contains(targetUser))
+        if (item.Owners.Any(o => o.Id == targetUser.Id))
         {
             throw new ValidationException("Item is already shared with the target user.");
         }
         if (cachedItems.Exists(i => i.Id == item.Id))
         {
-                cachedItems.RemoveAll(i => i.Id == item.Id);
+            cachedItems.RemoveAll(i => i.Id == item.Id);
         }
         innerService.ShareItem(targetUser, item);
     }
     public void UnShareItem(User targetUser, IItem item)
     {
         EnsureLoggedInAndOwner(item);
-        if (targetUser == currentUser)
+        if (targetUser.Id == currentUser!.Id)
         {
             throw new ValidationException("Owner cannot unshare the item with themselves.");
         }
-        if (!item.Owners.Contains(targetUser))
+        if (!item.Owners.Any(o => o.Id == targetUser.Id))
         {
             throw new ValidationException("Item is not shared with the target user.");
         }
