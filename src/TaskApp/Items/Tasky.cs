@@ -17,10 +17,9 @@ public class Tasky : ItemBase
     }
     public override IItem Clone()
     {
-        return new Tasky(this.Title, this.DueDate, this.Priority)
-        {
-            IsCompleted = this.IsCompleted
-        };
+        var cloneTasky = new Tasky(this.Title, this.DueDate, this.Priority);
+        cloneTasky.Owners = this.Owners;
+        return cloneTasky;
     }
     public override void Restore(IItem state)
     {
