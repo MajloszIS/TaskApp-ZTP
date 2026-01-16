@@ -74,30 +74,24 @@ public void AddFolderToFolder(string parentFolderName, string childFolderName)
     if (user == null)
         throw new Exception("No user logged in");
 
-    // Pobieramy wszystkie foldery użytkownika
     var allFolders = itemManager
         .GetAllItemsForUser(user)
         .OfType<ItemGroup>()
         .ToList();
 
-    // Szukamy folderu nadrzędnego
     var parentFolder = allFolders.FirstOrDefault(f => f.Title == parentFolderName);
     if (parentFolder == null)
         throw new Exception("Parent folder not found");
 
-    // Sprawdzamy, czy folder o tej samej nazwie już istnieje w parentFolder
     if (parentFolder.Children.OfType<ItemGroup>().Any(f => f.Title == childFolderName))
         throw new Exception("Folder already exists in this folder");
 
-    // Nie pozwalamy na włożenie folderu do samego siebie
     if (parentFolderName == childFolderName)
         throw new Exception("Folder cannot contain itself");
 
-    // Tworzymy nowy folder i dodajemy do parentFolder
     var childFolder = new ItemGroup(childFolderName);
     parentFolder.Add(childFolder);
 
-    // Aktualizujemy parentFolder w repozytorium
     itemManager.UpdateItem(parentFolder);
 }
 
@@ -171,7 +165,50 @@ public ItemGroup ViewFolder(Guid folderId)
 
     return folder;
 }
-public void DeleteFolder(string folderName) {var user = authService.GetCurrentUser(); if (user == null) throw new Exception("No user logged in"); var folders = itemManager .GetAllItemsForUser(user) .OfType<ItemGroup>() .ToList(); ItemGroup? parent = null; ItemGroup? target = null; foreach (var f in folders) { if (f.Title == folderName) { target = f; break; } var child = f.Children .OfType<ItemGroup>() .FirstOrDefault(c => c.Title == folderName); if (child != null) { parent = f; target = child; break; } } if (target == null) throw new Exception("Folder not found"); var command = new DeleteFolderCommand(itemManager, target, parent); GetHistoryForCurrentUser().Execute(command); }
+public void DeleteFolder(string folderName)
+{
+    var user = authService.GetCurrentUser();
+    if (user == null)
+    {
+        throw new Exception("No user logged in");
+    }
+
+    var folders = itemManager
+        .GetAllItemsForUser(user)
+        .OfType<ItemGroup>()
+        .ToList();
+
+    ItemGroup? parent = null;
+    ItemGroup? target = null;
+
+    foreach (var f in folders)
+    {
+        if (f.Title == folderName)
+        {
+            target = f;
+            break;
+        }
+
+        var child = f.Children
+            .OfType<ItemGroup>()
+            .FirstOrDefault(c => c.Title == folderName);
+
+        if (child != null)
+        {
+            parent = f;
+            target = child;
+            break;
+        }
+    }
+
+    if (target == null)
+    {
+        throw new Exception("Folder not found");
+    }
+
+    var command = new DeleteFolderCommand(itemManager, target, parent);
+    GetHistoryForCurrentUser().Execute(command);
+}
     public void AddTask(string title, DateTime dueDate, int priority)
     {
         if(string.IsNullOrEmpty(title))

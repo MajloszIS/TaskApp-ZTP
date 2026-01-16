@@ -148,7 +148,7 @@ static void ViewFolder(TaskAppFacade app)
         return;
     }
 
-    Console.WriteLine($"\n📁 {folder.Title}");
+    Console.WriteLine($"\nFolder: {folder.Title}");
     if (folder.Children.Count == 0)
     {
         Console.WriteLine("(Empty)");
@@ -242,7 +242,8 @@ static void DisplayFolders(List<ItemGroup> folders, int indent = 0)
     string indentStr = new string(' ', indent * 2);
     foreach (var folder in folders)
     {
-        Console.WriteLine($"{indentStr}📁 {folder.Title} ({folder.Children.Count} items)");
+        Console.WriteLine($"{indentStr}[Folder] {folder.Title} ({folder.Children.Count} items)");
+
         var subFolders = folder.Children.OfType<ItemGroup>().ToList();
         if (subFolders.Count > 0)
         {
@@ -258,14 +259,15 @@ static void DisplayFolderContents(List<IItem> items, int indent = 0)
     {
         if (item is ItemGroup folder)
         {
-            Console.WriteLine($"{indentStr}📁 {folder.Title} ({folder.Children.Count} items)");
+            Console.WriteLine($"{indentStr}[Folder] {folder.Title} ({folder.Children.Count} items)");
         }
         else
         {
-            Console.WriteLine($"{indentStr}📄 {item.Title}");
+            Console.WriteLine($"{indentStr}[Item] {item.Title}");
         }
     }
 }
+
 
 
 
@@ -675,7 +677,7 @@ case "7":
                 break;
         }
     }
-ExitFolderManagement:
+    ExitFolderManagement:
     break;
             case "0":
                 app.Logout();
