@@ -5,7 +5,7 @@ namespace TaskApp.Items;
 public class Note : ItemBase
 {
     public string? Content;
-    public List<string>? Tags;
+    public List<string> Tags;
 
     public Note(string title, string content)
                 :base(title)
@@ -19,12 +19,13 @@ public class Note : ItemBase
     }
     public override IItem Clone()
     {
-        var clone = new Note(this.Title, this.Content ?? "");
+        var cloneNote = new Note(this.Title, this.Content ?? "");
+        cloneNote.Owners = this.Owners;
         if (this.Tags != null)
         {
-            clone.Tags = new List<string>(this.Tags);
+            cloneNote.Tags = new List<string>(this.Tags);
         }
-        return clone;
+        return cloneNote;
     }
     public override void Restore(IItem state)
     {
