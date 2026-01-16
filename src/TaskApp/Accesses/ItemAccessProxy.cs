@@ -19,9 +19,14 @@ public class ItemAccessProxy : IItemAccess
     private void EnsureLoggedInAndOwner(IItem item)
     {
         if (currentUser == null)
+        {
             throw new AccessDeniedException();
+        }
         if (!item.Owners.Contains(currentUser))
+        {
+            cachedItems.Clear();
             throw new AccessDeniedException();
+        }
     }
     public void SetCurrentUser(User? user)
     {
@@ -65,12 +70,19 @@ public class ItemAccessProxy : IItemAccess
     }
     public List<IItem> GetAllItemsForUser(User user)
     {
+        if (currentUser == null)
+            throw new AccessDeniedException();
+
+        if (user.Id != currentUser.Id)
+            throw new AccessDeniedException();
+            
         var items = innerService.GetAllItemsForUser(user);
         foreach (var item in items)
         {
             if (!item.Owners.Contains(user))
             {
-                throw new Exception("Access denied to item");
+                cachedItems.Clear();
+                throw new AccessDeniedException();
             }
         }
         return items;
@@ -79,7 +91,7 @@ public class ItemAccessProxy : IItemAccess
     {
         if (currentUser == null)
         {
-            throw new Exception("No user is logged in.");
+            throw new AccessDeniedException();
         }
         if (!item.Owners.Contains(currentUser))
         {
@@ -127,7 +139,7 @@ public class ItemAccessProxy : IItemAccess
         EnsureLoggedInAndOwner(item);
         if (targetUser == currentUser)
         {
-            throw new ValidationException("Item is not shared with the target user.");
+            throw new ValidationException("Owner cannot unshare the item with themselves.");
         }
         if (!item.Owners.Contains(targetUser))
         {
