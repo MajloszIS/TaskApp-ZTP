@@ -38,177 +38,53 @@ public class TaskAppFacade
     public void AddNote(string title, string content)
     {
         if(string.IsNullOrEmpty(title))
-        {
-            throw new ValidationException("Title cannot be empty.");
-        }
+            {
+                throw new ValidationException("Title cannot be empty.");
+            }
         var note = new Note(title, content);
         var command = new AddItemCommand(itemManager, note);
         GetHistoryForCurrentUser().Execute(command);
     }
-
-public void CreateFolder(string title)
-{
-    if (string.IsNullOrWhiteSpace(title))
-        throw new Exception("Folder title cannot be empty");
-
-    var user = authService.GetCurrentUser();
-    if (user == null)
-        throw new Exception("No user logged in");
-
-    var exists = itemManager
-        .GetAllItemsForUser(user)
-        .OfType<ItemGroup>()
-        .Any(f => f.Title == title);
-
-    if (exists)
-        throw new Exception("Folder with this name already exists");
-
-    var folder = new ItemGroup(title);
-    var command = new AddItemCommand(itemManager, folder);
-    GetHistoryForCurrentUser().Execute(command);
-}
-
-public void AddFolderToFolder(string parentFolderName, string childFolderName)
-{
-    var user = authService.GetCurrentUser();
-    if (user == null)
-        throw new Exception("No user logged in");
-
-    var allFolders = itemManager
-        .GetAllItemsForUser(user)
-        .OfType<ItemGroup>()
-        .ToList();
-
-    var parentFolder = allFolders.FirstOrDefault(f => f.Title == parentFolderName);
-    if (parentFolder == null)
-        throw new Exception("Parent folder not found");
-
-    if (parentFolder.Children.OfType<ItemGroup>().Any(f => f.Title == childFolderName))
-        throw new Exception("Folder already exists in this folder");
-
-    if (parentFolderName == childFolderName)
-        throw new Exception("Folder cannot contain itself");
-
-    var childFolder = new ItemGroup(childFolderName);
-    parentFolder.Add(childFolder);
-
-    itemManager.UpdateItem(parentFolder);
-}
-
-public List<ItemGroup> GetRootFolders()
-{
-    var user = authService.GetCurrentUser();
-    if (user == null)
-        throw new Exception("No user logged in");
-
-    var allFolders = itemManager
-        .GetAllItemsForUser(user)
-        .OfType<ItemGroup>()
-        .ToList();
-
-    var childFolders = new HashSet<Guid>();
-    foreach (var folder in allFolders)
+    public void CreateFolder(string title)
     {
-        foreach (var child in folder.Children.OfType<ItemGroup>())
-        {
-            childFolders.Add(child.Id);
-        }
+        itemManager.CreateFolder(title);
     }
 
-    return allFolders.Where(f => !childFolders.Contains(f.Id)).ToList();
-}
-
-public void AddItemToFolder(Guid folderId, Guid itemId)
-{
-    var user = authService.GetCurrentUser();
-    if (user == null)
-        throw new Exception("No user logged in");
-
-    var folder = itemManager.GetItemById(folderId) as ItemGroup;
-    if (folder == null)
-        throw new Exception("Folder not found");
-
-    var item = itemManager.GetItemById(itemId);
-    if (item == null)
-        throw new Exception("Item not found");
-
-    folder.Add(item);
-    itemManager.UpdateItem(folder);
-}
-public void RemoveItemFromFolder(Guid folderId, Guid itemId)
-{
-    var folder = itemManager.GetItemById(folderId) as ItemGroup;
-    if (folder == null)
-        throw new Exception("Folder not found");
-
-    var item = folder.Children.FirstOrDefault(i => i.Id == itemId);
-    if (item == null)
-        throw new Exception("Item not in folder");
-
-    folder.Remove(item);
-    itemManager.UpdateItem(folder);
-}
-public void ShareFolder(Guid folderId, string targetUsername)
-{
-    var folder = itemManager.GetItemById(folderId) as ItemGroup;
-    if (folder == null)
-        throw new Exception("Folder not found");
-
-    var target = authService.GetUserByUsername(targetUsername);
-    itemManager.ShareItem(target, folder);
-}
-public ItemGroup ViewFolder(Guid folderId)
-{
-    var folder = itemManager.GetItemById(folderId) as ItemGroup;
-    if (folder == null)
-        throw new Exception("Folder not found");
-
-    return folder;
-}
-public void DeleteFolder(string folderName)
-{
-    var user = authService.GetCurrentUser();
-    if (user == null)
+    public void AddFolderToFolder(string parentFolderName, string childFolderName)
     {
-        throw new Exception("No user logged in");
+        itemManager.AddFolderToFolder(parentFolderName, childFolderName);
     }
 
-    var folders = itemManager
-        .GetAllItemsForUser(user)
-        .OfType<ItemGroup>()
-        .ToList();
-
-    ItemGroup? parent = null;
-    ItemGroup? target = null;
-
-    foreach (var f in folders)
+    public void DeleteFolder(string name)
     {
-        if (f.Title == folderName)
-        {
-            target = f;
-            break;
-        }
-
-        var child = f.Children
-            .OfType<ItemGroup>()
-            .FirstOrDefault(c => c.Title == folderName);
-
-        if (child != null)
-        {
-            parent = f;
-            target = child;
-            break;
-        }
+        itemManager.RemoveFolder(name);
+    }
+    public void AddItemToFolder(Guid folderId, Guid itemId)
+    {
+        itemManager.AddItemToFolder(folderId, itemId);
     }
 
-    if (target == null)
+    public void RemoveItemFromFolder(Guid folderId, Guid itemId)
     {
-        throw new Exception("Folder not found");
+        itemManager.RemoveItemFromFolder(folderId, itemId);
     }
 
-    var command = new DeleteFolderCommand(itemManager, target, parent);
-    GetHistoryForCurrentUser().Execute(command);
-}
+    public void ShareFolder(Guid folderId, string targetUsername)
+    {
+        var target = authService.GetUserByUsername(targetUsername)
+            ?? throw new Exception("User not found");
+        itemManager.ShareFolder(folderId, target);
+    }
+    public ItemGroup ViewFolder(Guid folderId)
+    {
+        return itemManager.ViewFolder(folderId);
+    }
+
+    public List<ItemGroup> GetRootFolders()
+    {
+        return itemManager.GetRootFolders();
+    }
+
     public void AddTask(string title, DateTime dueDate, int priority)
     {
         if(string.IsNullOrEmpty(title))
@@ -216,16 +92,6 @@ public void DeleteFolder(string folderName)
             throw new Exception("Title cannot be empty");
         }
         var task = new Tasky(title, dueDate, priority);
-        var command = new AddItemCommand(itemManager, task);
-        GetHistoryForCurrentUser().Execute(command);
-    }
-    public void AddFolder(string title)
-    {
-        if (string.IsNullOrEmpty(title))
-        {
-            throw new Exception("Title cannot be empty");
-        }
-        var task = new ItemGroup(title);
         var command = new AddItemCommand(itemManager, task);
         GetHistoryForCurrentUser().Execute(command);
     }
@@ -365,7 +231,6 @@ public void DeleteFolder(string folderName)
     var item = itemManager.GetItemByTitle(title);
     if (item == null) throw new Exception("Item not found");
 
-    new SaveStateCommand(itemManager, item).Execute();
 }
 
 public void RestoreItemState(string title)
@@ -374,7 +239,5 @@ public void RestoreItemState(string title)
     if (item == null) throw new Exception("Item not found");
 
 
-    var command = new RestoreStateCommand(itemManager, item);
-    GetHistoryForCurrentUser().Execute(command);
 }
 }
