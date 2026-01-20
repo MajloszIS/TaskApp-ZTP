@@ -484,6 +484,31 @@ static void DeleteFolder(TaskAppFacade app)
         }
         Pause();
     }
+    static void DeleteItem(TaskAppFacade app)
+    {
+        Console.WriteLine("= Delete Item=\n");
+        Console.Write("Enter title of the item to delete: ");
+        var title = Console.ReadLine();
+
+        try
+        {
+            var itemToDelete = FindAndSelectItem(app, title);
+
+            if (itemToDelete == null) return;
+            app.DeleteItem(itemToDelete.Title);
+
+            Console.WriteLine("Item deleted successfully.");
+        }
+        catch (ItemNotFoundException)
+        {
+            Console.WriteLine($"Item with title '{title}' does not exist.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        Pause();
+    }
 
     static IItem FindAndSelectItem(TaskAppFacade app, string title)
     {
@@ -608,6 +633,7 @@ static void UserMenu(TaskAppFacade app)
         Console.WriteLine("5. Pin item");
         Console.WriteLine("6. Clone item");
         Console.WriteLine("7. Folder management");
+        Console.WriteLine("8. Delete item");
         Console.WriteLine("0. Logout");
         Console.Write("Choice: ");
 
@@ -646,40 +672,43 @@ static void UserMenu(TaskAppFacade app)
                 CloneItem(app);
                 break;
 
-case "7":
-    while (true) 
-    {
-        Console.Clear();
-        Console.WriteLine("=== Folder Management ===");
-        Console.WriteLine("1. Create folder");
-        Console.WriteLine("2. Add item to folder");
-        Console.WriteLine("3. Remove item from folder");
-        Console.WriteLine("4. Share folder");
-        Console.WriteLine("5. View folder");
-        Console.WriteLine("6. Delete folder");
-        Console.WriteLine("7. Add folder to folder");
-        Console.WriteLine("0. Back");
+            case "7":
+                while (true) 
+                {
+                    Console.Clear();
+                    Console.WriteLine("=== Folder Management ===");
+                    Console.WriteLine("1. Create folder");
+                    Console.WriteLine("2. Add item to folder");
+                    Console.WriteLine("3. Remove item from folder");
+                    Console.WriteLine("4. Share folder");
+                    Console.WriteLine("5. View folder");
+                    Console.WriteLine("6. Delete folder");
+                    Console.WriteLine("7. Add folder to folder");
+                    Console.WriteLine("0. Back");
 
-        var folderChoice = Console.ReadLine();
+                    var folderChoice = Console.ReadLine();
 
-        switch (folderChoice)
-        {
-            case "1": CreateFolder(app); break;
-            case "2": AddItemToFolder(app); break;
-            case "3": RemoveItemFromFolder(app); break;
-            case "4": ShareFolder(app); break;
-            case "5": ViewFolder(app); break;
-            case "6": DeleteFolder(app); break;
-            case "7": AddFolderToFolderConsole(app); break;
-            case "0": goto ExitFolderManagement; 
-            default:
-                Console.WriteLine("Invalid option");
-                Pause();
+                    switch (folderChoice)
+                    {
+                        case "1": CreateFolder(app); break;
+                        case "2": AddItemToFolder(app); break;
+                        case "3": RemoveItemFromFolder(app); break;
+                        case "4": ShareFolder(app); break;
+                        case "5": ViewFolder(app); break;
+                        case "6": DeleteFolder(app); break;
+                        case "7": AddFolderToFolderConsole(app); break;
+                        case "0": goto ExitFolderManagement; 
+                        default:
+                        Console.WriteLine("Invalid option");
+                        Pause();
+                        break;
+                    }
+                }
+                ExitFolderManagement:
                 break;
-        }
-    }
-    ExitFolderManagement:
-    break;
+            case "8":
+                DeleteItem(app);
+                break;
             case "0":
                 app.Logout();
                 return;
@@ -691,7 +720,6 @@ case "7":
         }
     }
 }
-
 
     static void Pause()
     {
