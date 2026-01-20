@@ -66,8 +66,17 @@ public class Program
 
         try
         {
-            app.PinItem(title);
-            Console.WriteLine("Item pinned successfully.");
+            var current = app.GetAllItems().FirstOrDefault(i => i.Title == title);
+            if (current is PinnedItemDecorator)
+            {
+                app.UnpinItem(title);
+                Console.WriteLine("Item unpinned successfully.");
+            }
+            else
+            {
+                app.PinItem(title);
+                Console.WriteLine("Item pinned successfully.");
+            }
         }
         catch (Exception ex)
         {
