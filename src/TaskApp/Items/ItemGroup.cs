@@ -23,20 +23,17 @@ public class ItemGroup : ItemBase
         Children.Remove(item);
     }
 
-    public override IItem Clone()
+public override IItem Clone()
+{
+    var clone = new ItemGroup(this.Title);
+
+    clone.Owners = new List<User>(this.Owners);
+
+    foreach (var child in Children)
     {
-        var newGroup = new ItemGroup(this.Title);
-        foreach (var item in Children) 
-        { 
-            var childClone = item.Clone(); 
-            if (childClone != null) 
-            {
-                newGroup.Add(childClone); 
-            }
-        }
-        newGroup.Title = this.Title; 
-        return newGroup;
+        clone.Add(child);
     }
 
-
+    return clone;
+}
 }

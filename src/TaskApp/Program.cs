@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using TaskApp.Exceptions;
 using TaskApp.Items;
+using TaskApp.Observer;
 using TaskApp.Repository;
 
 public class Program
@@ -374,7 +375,7 @@ static void AddFolderToFolderConsole(TaskAppFacade app)
     Console.Write("\nParent folder name: ");
     var parent = Console.ReadLine();
 
-    Console.Write("New folder name: ");
+    Console.Write("Which one to add?: ");
     var child = Console.ReadLine();
 
     try
