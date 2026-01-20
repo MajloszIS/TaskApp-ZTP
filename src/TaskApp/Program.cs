@@ -519,6 +519,40 @@ static void DeleteFolder(TaskAppFacade app)
         Pause();
     }
 
+    static void BackupItem(TaskAppFacade app)
+{
+    Console.WriteLine("= Backup Item =\n");
+    Console.Write("Enter title of the item to backup: ");
+    var title = Console.ReadLine();
+
+    try
+    {
+        app.SaveItemState(title);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+    Pause();
+}
+
+static void RestoreItem(TaskAppFacade app)
+{
+    Console.WriteLine("= Restore Item =\n");
+    Console.Write("Enter title of the item to restore: ");
+    var title = Console.ReadLine();
+
+    try
+    {
+        app.RestoreItemState(title);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
+    }
+    Pause();
+}
+
     static IItem FindAndSelectItem(TaskAppFacade app, string title)
     {
         var allItems = app.GetAllItems();
@@ -643,6 +677,8 @@ static void UserMenu(TaskAppFacade app)
         Console.WriteLine("6. Clone item");
         Console.WriteLine("7. Folder management");
         Console.WriteLine("8. Delete item");
+        Console.WriteLine("9. Backup Item");
+        Console.WriteLine("10. Restore Item");
         Console.WriteLine("0. Logout");
         Console.Write("Choice: ");
 
@@ -717,6 +753,12 @@ static void UserMenu(TaskAppFacade app)
                 break;
             case "8":
                 DeleteItem(app);
+                break;
+            case "9":
+                BackupItem(app);
+                break;
+            case "10":
+                RestoreItem(app);
                 break;
             case "0":
                 app.Logout();

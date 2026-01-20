@@ -231,6 +231,8 @@ public class TaskAppFacade
     var item = itemManager.GetItemByTitle(title);
     if (item == null) throw new Exception("Item not found");
 
+    var command = new SaveStateCommand(itemManager, item);
+    GetHistoryForCurrentUser().Execute(command);
 }
 
 public void RestoreItemState(string title)
@@ -238,6 +240,7 @@ public void RestoreItemState(string title)
     var item = itemManager.GetItemByTitle(title);
     if (item == null) throw new Exception("Item not found");
 
-
+    var command = new RestoreStateCommand(itemManager, item);
+    GetHistoryForCurrentUser().Execute(command);
 }
 }
