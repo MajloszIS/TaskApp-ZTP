@@ -38,3 +38,12 @@ public class ValidationException : TaskAppException
 {
     public ValidationException(string message) : base(message) { }
 }
+public class InvalidSortModeException : TaskAppException
+{
+    public InvalidSortModeException(string mode) : base($"Sort mode '{mode}' is not supported.") { }
+}
+
+public class InvalidFilterSyntaxException : TaskAppException
+{
+    public InvalidFilterSyntaxException(string token) : base($"Invalid filter syntax or value: '{token}'.") { }
+}

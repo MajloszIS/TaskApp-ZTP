@@ -618,7 +618,50 @@ static void RestoreItem(TaskAppFacade app)
             return $"{prefix}{displayItem.Title}";
         }
     }
+    static void FilterItems(TaskAppFacade app)
+    {
+        Console.Clear();
+        Console.WriteLine("= Filter Items =\n");
+        Console.WriteLine("Examples: 'due:today', 'priority:>=2', 'tasks', 'tag:work'");
+        Console.Write("Enter criteria: ");
+        var criteria = Console.ReadLine();
 
+        try
+        {
+            var results = app.FilterItems(criteria);
+
+            Console.WriteLine($"\nFound {results.Count} items:\n");
+            foreach (var item in results)
+            {
+                Console.WriteLine(FormatItemForDisplay(item));
+            }
+        }
+        catch (InvalidFilterSyntaxException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        Pause();
+    }
+    static void SortItems(TaskAppFacade app)
+    {
+        Console.Clear();
+        Console.WriteLine("= Sort Items =\n");
+        Console.WriteLine("Modes: 'title-asc/desc' 'created-asc/desc' 'due-asc/desc' 'priority-asc/desc' 'complted-first/last'");
+        Console.Write("Enter sort mode: ");
+        var mode = Console.ReadLine();
+        try
+        {
+            var allItems = app.GetAllItems();
+
+            Console.WriteLine("\n---Results---\n");
+            app.PrintSortedItems(allItems, mode);
+        }
+        catch (InvalidSortModeException ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        Pause();
+    }
     static void Register(TaskAppFacade app)
     {
         Console.WriteLine("= Register =\n");
@@ -677,8 +720,10 @@ static void UserMenu(TaskAppFacade app)
         Console.WriteLine("6. Clone item");
         Console.WriteLine("7. Folder management");
         Console.WriteLine("8. Delete item");
-        Console.WriteLine("9. Backup Item");
-        Console.WriteLine("10. Restore Item");
+        Console.WriteLine("9. Backup item");
+        Console.WriteLine("10. Restore item");
+        Console.WriteLine("11. Filter items");
+        Console.WriteLine("12. Sort items");
         Console.WriteLine("0. Logout");
         Console.Write("Choice: ");
 
@@ -759,6 +804,12 @@ static void UserMenu(TaskAppFacade app)
                 break;
             case "10":
                 RestoreItem(app);
+                break;
+            case "11":
+                FilterItems(app); 
+                break;
+            case "12":
+                SortItems(app); 
                 break;
             case "0":
                 app.Logout();
