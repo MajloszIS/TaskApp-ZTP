@@ -130,6 +130,125 @@ public class Program
             Console.WriteLine(ex.Message);
             Pause();
         }
+        Console.WriteLine();
+        Console.WriteLine("Actions:");
+        Console.WriteLine("1. Filter items");
+        Console.WriteLine("2. Sort items");
+        Console.WriteLine("3. Search items");
+        Console.WriteLine("0. Back");
+        Console.Write("Choice: ");
+        var choice = Console.ReadLine();
+        switch (choice)
+        {
+            case "1":
+                FilterItems(app);
+                break;
+            case "2":
+                SortItems(app);
+                break;
+            case "3":
+                SearchItems(app);
+                break;
+            case "0":
+                Pause();
+                break;
+            default:
+                Console.WriteLine("Invalid option");
+                Pause();
+                break;
+        }
+    }
+    static void FilterItems(TaskAppFacade app)
+    {
+        Console.Clear();
+        Console.WriteLine("=== Filter Items ===\n");
+        Console.WriteLine("Enter criteria (comma-separated), e.g.:");
+        Console.WriteLine("notes, tasks, completed:true, priority:>=2, due:today, tag:work");
+        Console.Write("Criteria: ");
+        var criteria = Console.ReadLine();
+
+        try
+        {
+            var filtered = app.FilterItems(criteria);
+            if (filtered.Count == 0)
+            {
+                Console.WriteLine("(Empty)");
+            }
+            else
+            {
+                foreach (var item in filtered)
+                {
+                    Console.WriteLine(FormatItemForDisplay(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        Pause();
+    }
+
+    static void SortItems(TaskAppFacade app)
+    {
+        Console.Clear();
+        Console.WriteLine("=== Sort Items ===\n");
+        Console.WriteLine("Available modes:");
+        Console.WriteLine("title-asc, title-desc, created-asc, created-desc");
+        Console.WriteLine("due-asc, due-desc, priority-asc, priority-desc");
+        Console.WriteLine("completed-first, completed-last");
+        Console.Write("Mode: ");
+        var mode = Console.ReadLine();
+
+        try
+        {
+            var items = app.GetAllItems();
+            var sorted = app.SortItems(items, mode);
+            if (sorted.Count == 0)
+            {
+                Console.WriteLine("(Empty)");
+            }
+            else
+            {
+                foreach (var item in sorted)
+                {
+                    Console.WriteLine(FormatItemForDisplay(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        Pause();
+    }
+
+    static void SearchItems(TaskAppFacade app)
+    {
+        Console.Clear();
+        Console.WriteLine("=== Search Items ===\n");
+        Console.Write("Text: ");
+        var text = Console.ReadLine();
+
+        try
+        {
+            var found = app.SearchItems(text);
+            if (found.Count == 0)
+            {
+                Console.WriteLine("(Empty)");
+            }
+            else
+            {
+                foreach (var item in found)
+                {
+                    Console.WriteLine(FormatItemForDisplay(item));
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
         Pause();
     }
 static void ViewFolder(TaskAppFacade app)
