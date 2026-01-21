@@ -169,18 +169,7 @@ public class Program
 
         try
         {
-            var filtered = app.FilterItems(criteria);
-            if (filtered.Count == 0)
-            {
-                Console.WriteLine("(Empty)");
-            }
-            else
-            {
-                foreach (var item in filtered)
-                {
-                    Console.WriteLine(FormatItemForDisplay(item));
-                }
-            }
+            app.PrintFilteredItems(criteria);
         }
         catch (Exception ex)
         {
@@ -203,18 +192,7 @@ public class Program
         try
         {
             var items = app.GetAllItems();
-            var sorted = app.SortItems(items, mode);
-            if (sorted.Count == 0)
-            {
-                Console.WriteLine("(Empty)");
-            }
-            else
-            {
-                foreach (var item in sorted)
-                {
-                    Console.WriteLine(FormatItemForDisplay(item));
-                }
-            }
+            app.PrintSortedItems(items, mode);
         }
         catch (Exception ex)
         {
@@ -232,18 +210,7 @@ public class Program
 
         try
         {
-            var found = app.SearchItems(text);
-            if (found.Count == 0)
-            {
-                Console.WriteLine("(Empty)");
-            }
-            else
-            {
-                foreach (var item in found)
-                {
-                    Console.WriteLine(FormatItemForDisplay(item));
-                }
-            }
+            app.PrintSearchedItems(text);
         }
         catch (Exception ex)
         {
