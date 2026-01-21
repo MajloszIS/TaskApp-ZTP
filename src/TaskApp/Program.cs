@@ -21,7 +21,7 @@ public class Program
         try
         {
             app.AddNote(title, content);
-            Console.WriteLine("Note added successfully");
+            Pause();
         }
         catch (TaskAppException ex)
         {
@@ -51,6 +51,7 @@ public class Program
         try
         {
             app.AddTask(title, dueDate, priority);
+            Pause();
         }
         catch (Exception ex)
         {
@@ -98,7 +99,7 @@ public class Program
         try
         {
             app.ShareItem(title, targetUser);
-            Console.WriteLine($"Item shared with {targetUser} successfully.");
+            Pause();
         }
         catch (Exception ex)
         {
@@ -455,7 +456,7 @@ static void DeleteFolder(TaskAppFacade app)
 
             app.EditItem(itemToEdit.Id, newTitle, newContent);
 
-            Console.WriteLine("Item updated successfully.");
+            Pause();
         }
         catch (ItemNotFoundException)
         {
@@ -505,8 +506,7 @@ static void DeleteFolder(TaskAppFacade app)
 
             if (itemToDelete == null) return;
             app.DeleteItem(itemToDelete.Title);
-
-            Console.WriteLine("Item deleted successfully.");
+            Pause();
         }
         catch (ItemNotFoundException)
         {
@@ -783,6 +783,8 @@ static void UserMenu(TaskAppFacade app)
         var userRepo = new UserRepository();
         var itemRepo = new ItemRepository();
         var app = new TaskAppFacade(userRepo, itemRepo);
+        app.AttachObserver(new NotificationService());
+        app.AttachObserver(new ItemsListView());
 
         while (true)
         {

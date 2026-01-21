@@ -12,6 +12,6 @@ public class NotificationService : IItemObserver
 {
     public void Update(ItemChangeEvent evt)
     {
-        Console.WriteLine($"[POWIADOMIENIE] DING! Użytkownik {evt.User.Username} zmienił status zadania '{evt.Item.Title}' ({evt.ChangeType}).");
+        Console.WriteLine($"[POWIADOMIENIE] Użytkownik {evt.User.Username} zmienił status zadania '{evt.Item.Title}' ({evt.ChangeType}).");
     }
 }
