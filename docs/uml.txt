@@ -1,0 +1,400 @@
+@startuml
+title Aplikacja do zarzadzania notatkami i zadaniami (Finalna wersja ZTP)
+
+' Ustawienia graficzne
+skinparam classAttributeIconSize 12
+skinparam classFontSize 11
+
+' =============================
+'   DOMAIN
+' =============================
+
+interface IItem {
+  + Id : Guid
+  + Title : string
+  + CreatedAt : DateTime
+  + Owners : List<User>
+  + Clone() : IItem
+  + Restore(state : IItem)
+}
+
+abstract class ItemBase implements IItem {
+  + Id : Guid
+  + Title : string
+  + CreatedAt : DateTime
+  + Owners : List<User>
+  + Clone() : IItem
+  + Restore(state : IItem)
+  + GetOwners() : List<User)  
+}
+
+class Note extends ItemBase {
+  + Content : string          
+  + Tags : List<string>
+  + AddTag(tag : string)
+  + Clone() : IItem             
+  + Restore(state : IItem)      
+}
+
+class Tasky extends ItemBase {
+  + IsCompleted : bool
+  + DueDate : DateTime
+  + Priority : int
+  + Clone() : IItem             
+  + Restore(state : IItem)      
+}
+
+class ItemGroup extends ItemBase {
+  + Children : List<IItem>
+  + Add(item : IItem)
+  + Remove(item : IItem)
+  + Clone() : IItem
+}
+
+ItemGroup o-- IItem 
+ItemRepository  o-- IItem
+
+' =============================
+'   DECORATOR
+' =============================
+
+abstract class ItemDecorator implements IItem {
+  - innerItem : IItem
+  + Id : Guid
+  + Title : string
+  + CreatedAt : DateTime
+  + Owners : List<User>
+  + Clone() : IItem
+  + Restore(state : IItem)
+  + GetInnerItem() : IItem
+}
+
+class PinnedItemDecorator extends ItemDecorator {
+  - PinnedAt : DateTime
+}
+
+' =============================
+'   COMMAND + MEMENTO
+' =============================
+
+interface ICommand {
+  + Execute()
+  + Undo()
+}
+
+class ItemMemento {
+  + StateSnapshot : IItem
+  + Execute()
+  + Undo()
+}
+
+abstract class ItemCommandBase implements ICommand {
+  - item : IItem
+  - itemManager : ItemManager
+  - backup : ItemMemento
+  + Execute()
+  + Undo()
+  + CreateBackup()
+}
+
+class AddItemCommand extends ItemCommandBase {
+  - parentGroup : ItemGroup
+  + Execute()
+  + Undo()
+}
+
+class AddItemToGroupCommand extends ItemCommandBase {
+  - parentGroup : ItemGroup
+  + Execute()
+  + Undo()
+}
+
+class EditItemCommand extends ItemCommandBase {
+  - newTitle : string
+  - newContent : string
+  - oldTitle : string
+  - oldContent : string
+  + Execute()
+  + Undo()
+}
+
+class DeleteItemCommand extends ItemCommandBase {
+  - parentGroup : ItemGroup
+  + Execute()
+  + Undo()
+}
+
+class DeleteFolderCommand extends ItemCommandBase {
+  - manager : ItemManager
+  - folder : ItemGroup
+  - parent : ItemGroup
+  + Execute()
+  + Undo()
+}
+
+class CloneItemCommand extends ItemCommandBase {
+  - targetGroup : ItemGroup
+  - clonedItem : IItem
+  + Execute()
+  + Undo()
+}
+
+class PinItemCommand extends ItemCommandBase {
+  - unpinMode : bool
+  - pinnedItem : IItem
+  - innerItem : IItem
+  - executed : bool
+  + Execute()
+  + Undo()
+}
+
+class ShareItemCommand extends ItemCommandBase {
+  - targetUser : User
+  + Execute()
+  + Undo()
+}
+
+class SaveStateCommand extends ItemCommandBase {
+  + Execute()
+  + Undo()
+}
+
+class RestoreStateCommand extends ItemCommandBase {
+  - previousState : IItem
+  + Execute()
+  + Undo()
+}
+
+class CommandHistory {
+  - undoStack : Stack<ICommand>
+  - redoStack : Stack<ICommand>
+  + Execute(cmd : ICommand)
+  + Undo()
+  + Redo()
+}
+
+ItemCommandBase o-- ItemMemento
+CommandHistory o-- ICommand
+
+' =============================
+'   USERS + AUTORYZACJA
+' =============================
+
+class User {
+  + Id : Guid
+  + Username : string
+  - Password : string
+  + VerifyPassword(password : string) : bool
+}
+
+interface IUserRepository {
+  + GetUserById(id : Guid) : User
+  + GetUserByUsername(username : string) : User
+  + AddUser(user : User)
+}
+
+class UserRepository implements IUserRepository {
+  - users : List<User>
+}
+
+class AuthService {
+  - userRepository : IUserRepository
+  - currentUser : User
+  + Register(username : string, password : string)
+  + Login(username : string, password : string)
+  + Logout()
+  + GetCurrentUser() : User
+  + GetUserByUsername(username : string) : User
+}
+
+AuthService o-- IUserRepository
+AuthService o-- User
+UserRepository o-- User 
+
+' =============================
+'   REPOSITORY + QUERY
+' =============================
+
+interface IItemRepository {
+  + GetItemById(id : Guid) : IItem
+  + GetItemByTitle(title : string) : IItem
+  + GetAllItemsForUser(user : User) : List<IItem>
+  + AddItem(item : IItem)
+  + UpdateItem(item : IItem)
+  + DeleteItem(item : IItem)
+}
+
+class ItemRepository implements IItemRepository {
+  - _items : List<IItem>   
+}
+
+class ItemQueryService {
+  - repo : IItemRepository
+  + Filter(user : User, criteria : string) : List<IItem>
+  + Sort(items : List<IItem>, mode : string) : List<IItem>
+  + Search(user : User, text : string) : List<IItem>
+  + PrintAllItems(user : User)
+  + PrintFilteredItems(user : User, criteria : string)
+  + PrintSortedItems(items : List<IItem>, mode : string)
+  + PrintSearchedItems(user : User, text : string)
+}
+
+ItemQueryService o-- IItemRepository
+
+' =============================
+'   PROXY (ACCESS CONTROL)
+' =============================
+
+interface IItemAccess {
+  + GetItemById(itemId : Guid) : IItem
+  + GetItemByTitle(title : string) : IItem
+  + GetAllItemsForUser(user : User) : List<IItem>
+  + AddItem(item : IItem)
+  + UpdateItem(item : IItem)
+  + DeleteItem(item : IItem)
+  + ShareItem(targetUser : User, item : IItem)
+  + UnShareItem(targetUser : User, item : IItem)
+}
+
+class RealItemAccessService implements IItemAccess {
+  - itemRepo : IItemRepository
+}
+
+class ItemAccessProxy implements IItemAccess {
+  - innerService : IItemAccess
+  - cachedItems : List<IItem>
+  - currentUser : User
+  - EnsureLoggedInAndOwner(item : IItem)
+  + SetCurrentUser(user : User)
+  + GetItemById(itemId : Guid) : IItem
+  + GetItemByTitle(title : string) : IItem
+  + GetAllItemsForUser(user : User) : List<IItem>
+  + AddItem(item : IItem)
+  + UpdateItem(item : IItem)
+  + DeleteItem(item : IItem)
+  + ShareItem(targetUser : User, item : IItem)
+  + UnShareItem(targetUser : User, item : IItem)
+}
+
+RealItemAccessService o-- IItemRepository
+ItemAccessProxy o-- IItemAccess
+
+' =============================
+'   OBSERVER (MANAGER)
+' =============================
+
+class ItemChangeEvent {
+  + ChangeType : string
+  + Item : IItem
+  + User : User
+}
+
+interface IItemObserver {
+  + Update(event : ItemChangeEvent)
+}
+
+interface IItemObservable {
+  + Attach(observer : IItemObserver)
+  + Detach(observer : IItemObserver)
+  + Notify(event : ItemChangeEvent)
+}
+
+class ItemsListView implements IItemObserver {
+  - userLogs : Dictionary<string, List<string>>
+  + Update(event : ItemChangeEvent)
+}
+
+class NotificationService implements IItemObserver {
+  + Update(event : ItemChangeEvent)
+}
+
+class ItemManager implements IItemObservable {
+  - observers : List<IItemObserver>
+  - itemAccess : IItemAccess
+  - currentUser : User
+  - backups : Dictionary<Guid, ItemMemento>
+  + SetCurrentUser(user : User)
+  + GetItemById(itemId : Guid) : IItem
+  + GetItemByTitle(title : string) : IItem
+  + GetAllItemsForUser(user : User) : List<IItem>
+  + AddItem(item : IItem)
+  + UpdateItem(item : IItem)
+  + RemoveItem(item : IItem)
+  + ShareItem(targetUser : User, item : IItem)
+  + UnShareItem(targetUser : User, item : IItem)
+  + RestoreItem(itemId : Guid)
+  + Attach(observer : IItemObserver)
+  + Detach(observer : IItemObserver)
+  + Notify(event : ItemChangeEvent)
+  + CreateFolder(title : string)
+  + AddFolderToFolder(parentTitle : string, childTitle : string)
+  + RemoveFolder(folderName : string)
+  + GetRootFolders() : List<ItemGroup>
+  + AddItemToFolder(folderId : Guid, itemId : Guid)
+  + RemoveItemFromFolder(folderId : Guid, itemId : Guid)
+  + ShareFolder(folderId : Guid, targetUser : User)
+  + ViewFolder(folderId : Guid) : ItemGroup
+  + SetBackup(id : Guid, memento : ItemMemento)
+  + GetBackup(id : Guid) : ItemMemento
+}
+
+ItemManager o-- IItemAccess 
+ItemManager o-- IItemObserver
+ItemManager o-- ItemChangeEvent
+
+' =============================
+'   APPLICATION FACADE
+' =============================
+
+class TaskAppFacade {
+  - authService : AuthService
+  - itemManager : ItemManager
+  - userHistories : Dictionary<Guid, CommandHistory>
+  - queryService : ItemQueryService
+
+  + Register(username : string, password : string)
+  + Login(username : string, password : string)
+  + Logout()
+
+  + AddNote(title : string, content : string)
+  + AddTask(title : string, dueDate : DateTime, priority : int)
+  + EditItem(id : Guid, newTitle : string, newContent : string)
+  + CloneItem(title : string)
+  + DeleteItem(title : string)
+  + PinItem(title : string)
+  + UnpinItem(title : string)
+  + ShareItem(title : string, targetUsername : string)
+
+  + CreateFolder(title : string)
+  + AddFolderToFolder(parentFolderName : string, childFolderName : string)
+  + DeleteFolder(name : string)
+  + AddItemToFolder(folderId : Guid, itemId : Guid)
+  + RemoveItemFromFolder(folderId : Guid, itemId : Guid)
+  + ShareFolder(folderId : Guid, targetUsername : string)
+  + ViewFolder(folderId : Guid) : ItemGroup
+  + GetRootFolders() : List<ItemGroup>
+
+  + GetAllItems() : List<IItem>
+  + FilterItems(criteria : string) : List<IItem>
+  + SearchItems(text : string) : List<IItem>
+  + SortItems(items : List<IItem>, mode : string) : List<IItem>
+
+  + PrintAllItems()
+  + PrintFilteredItems(criteria : string)
+  + PrintSortedItems(items : List<IItem>, mode : string)
+  + PrintSearchedItems(text : string)
+
+  + Undo()
+  + Redo()
+  + AttachObserver(observer : IItemObserver)
+  + DetachObserver(observer : IItemObserver)
+  + SaveItemState(title : string)
+  + RestoreItemState(title : string)
+}
+
+TaskAppFacade o-- AuthService
+TaskAppFacade o-- ItemManager
+TaskAppFacade o-- CommandHistory
+TaskAppFacade o-- ItemQueryService
+
+@enduml
