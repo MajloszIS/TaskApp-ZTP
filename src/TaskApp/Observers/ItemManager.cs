@@ -4,6 +4,7 @@ using TaskApp.Items;
 using TaskApp.Observer;
 using TaskApp.Access;
 using TaskApp.Repository;
+using System.Numerics;
 //niektóre trzeba usunąc, nie wszystkie są potrzebne
 
 namespace TaskApp.Observer;
@@ -55,6 +56,8 @@ public class ItemManager : IItemObservable
     public void ShareItem(User targetUser, IItem item)
     {
         itemAccess.ShareItem(targetUser, item);
+        var user = currentUser ?? new User("System", "");
+        Notify(new ItemChangeEvent($"UDOSTĘPNIONO DLA: {targetUser.Username}", item, user));
     }
     public void SetCurrentUser(User? user)
     {
@@ -82,6 +85,8 @@ public class ItemManager : IItemObservable
     public void UnShareItem(User target, IItem item)
     {
         itemAccess.UnShareItem(target, item);
+        var user = currentUser ?? new User("System", "");
+        Notify(new ItemChangeEvent($"PRZESTANO UDOSTĘPNIAĆ DLA {target.Username}", item, user));
     }
 
     public void CreateFolder(string title)
