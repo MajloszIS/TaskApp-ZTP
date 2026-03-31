@@ -109,17 +109,3 @@ The system is built around a layered architecture:
 - API layer (REST)
 
 ---
-
-## 👥 Team
-- Miłosz Szymczuk
-- Miłosz Pawlaczyk
-- Jakub Komorowski
-- Adrian Lachowicz
-- Jan Kozłowski
-- Paweł Gronostajski
-
----
-
-## 📄 Documentation
-Full project documentation available here:  
-👉 (add link to PDF or repo file)
